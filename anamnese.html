@@ -1,0 +1,1517 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Anamnese Imobiliária — Paulo França</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Sans:wght@300;400;500&family=Bebas+Neue&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+<style>
+:root {
+  --teal: #0891B2;
+  --teal-dark: #0E7490;
+  --teal-light: #E0F7FA;
+  --teal-mid: #BAE6FD;
+  --gold: #C4933F;
+  --gold-light: #FEF3C7;
+  --dark: #0C1B2E;
+  --text: #1E293B;
+  --text-mid: #475569;
+  --text-soft: #94A3B8;
+  --bg: #F8FAFC;
+  --white: #FFFFFF;
+  --border: #E2E8F0;
+  --border-mid: #CBD5E1;
+  --card-shadow: 0 1px 4px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
+  --radius: 12px;
+  --radius-sm: 8px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
+
+/* ─── LANDING ─────────────────────────────────── */
+#landing { display: block; }
+#app { display: none; }
+
+/* NAV */
+.l-nav {
+  position: absolute; top: 0; left: 0; right: 0; z-index: 50;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 20px 48px;
+}
+.l-nav-logo {
+  display: flex; align-items: center;
+}
+.l-nav-logo img {
+  height: 44px; width: auto; display: block;
+  filter: brightness(0) invert(1);
+}
+.l-nav-btn {
+  background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.35);
+  color: white; font-family: 'DM Sans', sans-serif; font-size: 13px;
+  font-weight: 500; padding: 10px 24px; border-radius: 50px; cursor: pointer;
+  backdrop-filter: blur(8px); transition: all 0.2s; letter-spacing: 0.02em;
+}
+.l-nav-btn:hover { background: rgba(255,255,255,0.25); }
+
+/* HERO */
+.l-hero {
+  position: relative; height: 100vh; min-height: 620px;
+  display: flex; align-items: center;
+  background: #0C1B2E;
+  overflow: hidden;
+}
+.l-hero::after {
+  content: '';
+  position: absolute; bottom: 0; left: 0; right: 0; height: 35%;
+  background: linear-gradient(to top, rgba(7,22,36,0.7) 0%, transparent 100%);
+  pointer-events: none;
+}
+.l-skyline {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  width: 100%; height: auto; pointer-events: none; z-index: 1;
+}
+.l-hero::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(105deg, rgba(12,27,46,0.88) 0%, rgba(12,27,46,0.65) 50%, rgba(12,27,46,0.35) 100%);
+}
+.l-hero-content { position: relative; z-index: 2; padding: 0 48px; max-width: 700px; }
+.l-hero-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(196,147,63,0.2); border: 1px solid rgba(196,147,63,0.5);
+  color: #FCD34D; font-size: 11px; font-weight: 500; letter-spacing: 0.12em;
+  text-transform: uppercase; padding: 5px 14px; border-radius: 50px; margin-bottom: 24px;
+}
+.l-hero-badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: #FCD34D; }
+.l-hero-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(52px, 7vw, 84px);
+  line-height: 1.0; font-weight: 900; color: white; margin-bottom: 0;
+}
+.l-hero-title-gold { color: var(--gold); font-style: italic; display: block; }
+.l-hero-sub {
+  font-size: 17px; font-weight: 300; color: rgba(255,255,255,0.75);
+  line-height: 1.7; margin: 24px 0 36px; max-width: 500px;
+}
+.l-hero-actions { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.btn-primary {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--teal); color: white;
+  font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 500;
+  padding: 14px 30px; border-radius: 50px; border: none; cursor: pointer;
+  transition: all 0.25s; letter-spacing: 0.01em;
+}
+.btn-primary:hover { background: var(--teal-dark); transform: translateY(-1px); }
+.btn-primary svg { width: 16px; height: 16px; }
+.btn-outline {
+  display: inline-flex; align-items: center;
+  background: transparent; color: white;
+  font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 400;
+  padding: 14px 28px; border-radius: 50px; border: 1px solid rgba(255,255,255,0.4);
+  cursor: pointer; transition: all 0.2s;
+}
+.btn-outline:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.6); }
+.l-hero-trust {
+  position: absolute; bottom: 32px; left: 48px; right: 48px;
+  display: flex; gap: 28px; z-index: 2;
+}
+.l-trust-item { display: flex; align-items: center; gap: 8px; color: rgba(255,255,255,0.6); font-size: 13px; font-weight: 300; }
+.l-trust-item svg { width: 15px; height: 15px; opacity: 0.7; }
+
+/* HOW IT WORKS */
+.l-how { background: white; padding: 96px 48px; }
+.l-section-label { text-align: center; font-size: 11px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: var(--teal); margin-bottom: 12px; }
+.l-section-title { font-family: 'Playfair Display', serif; font-size: clamp(32px, 4vw, 44px); font-weight: 700; color: var(--dark); text-align: center; margin-bottom: 10px; line-height: 1.15; }
+.l-section-sub { text-align: center; font-size: 16px; font-weight: 300; color: var(--text-mid); margin-bottom: 56px; max-width: 520px; margin-left: auto; margin-right: auto; line-height: 1.7; }
+.l-pillars { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px; max-width: 1100px; margin: 0 auto; }
+.l-pillar {
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 28px 22px; text-align: center;
+  transition: all 0.25s;
+}
+.l-pillar:hover { border-color: var(--teal-mid); background: #F0FBFF; transform: translateY(-3px); box-shadow: var(--card-shadow); }
+.l-pillar-num {
+  width: 48px; height: 48px; border-radius: 50%;
+  background: var(--gold); color: white;
+  font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 16px;
+}
+.l-pillar-name { font-size: 15px; font-weight: 500; color: var(--dark); margin-bottom: 8px; line-height: 1.3; }
+.l-pillar-desc { font-size: 13px; font-weight: 300; color: var(--text-mid); line-height: 1.6; }
+
+/* CTA SECTION */
+.l-cta {
+  background: var(--dark); padding: 88px 48px; text-align: center;
+  background-image: radial-gradient(ellipse at 30% 50%, rgba(8,145,178,0.12) 0%, transparent 70%),
+                    radial-gradient(ellipse at 70% 50%, rgba(196,147,63,0.08) 0%, transparent 70%);
+}
+.l-cta-title { font-family: 'Playfair Display', serif; font-size: clamp(32px, 4vw, 48px); font-weight: 700; color: white; margin-bottom: 12px; line-height: 1.15; }
+.l-cta-title em { font-style: italic; color: var(--gold); }
+.l-cta-sub { font-size: 16px; font-weight: 300; color: rgba(255,255,255,0.6); margin-bottom: 36px; }
+.l-footer { background: var(--dark); border-top: 1px solid rgba(255,255,255,0.08); padding: 24px 48px; display: flex; align-items: center; justify-content: space-between; }
+.l-footer-logo { display: flex; align-items: center; }
+.l-footer-logo img { height: 32px; width: auto; opacity: 0.45; filter: brightness(0) invert(1); }
+.l-footer-copy { font-size: 12px; color: rgba(255,255,255,0.3); }
+
+/* ─── FORM APP ─────────────────────────────────── */
+.a-header {
+  position: sticky; top: 0; z-index: 100;
+  background: white; border-bottom: 1px solid var(--border);
+  padding: 0 32px; height: 56px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.a-header-back {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 13px; color: var(--text-mid); cursor: pointer;
+  background: none; border: none; font-family: 'DM Sans', sans-serif;
+  transition: color 0.15s;
+}
+.a-header-back:hover { color: var(--teal); }
+.a-header-back svg { width: 16px; height: 16px; }
+.a-header-title { font-size: 14px; font-weight: 500; color: var(--dark); }
+.a-header-right { display: flex; align-items: center; gap: 16px; }
+.a-time { font-size: 12px; color: var(--text-soft); display: flex; align-items: center; gap: 5px; }
+.a-time svg { width: 14px; height: 14px; }
+
+/* PROGRESS BAR */
+.a-progress-bar { height: 3px; background: var(--border); }
+.a-progress-fill { height: 100%; background: var(--teal); transition: width 0.4s ease; border-radius: 0 2px 2px 0; }
+
+/* STEP INDICATORS */
+.a-steps { background: white; border-bottom: 1px solid var(--border); padding: 0 32px; }
+.a-steps-inner { display: flex; gap: 0; max-width: 860px; margin: 0 auto; overflow-x: auto; padding: 16px 0; }
+.a-step {
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  flex: 1; min-width: 80px; cursor: pointer; opacity: 0.4; transition: opacity 0.2s;
+}
+.a-step.active { opacity: 1; }
+.a-step.done { opacity: 0.65; }
+.a-step.done .a-step-icon { background: #DCFCE7; border-color: #86EFAC; }
+.a-step.done .a-step-icon svg { stroke: #16A34A; }
+.a-step.done .a-step-label { color: #16A34A; }
+.a-step-icon {
+  width: 40px; height: 40px; border-radius: 50%;
+  border: 2px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  background: var(--bg); transition: all 0.2s;
+}
+.a-step.active .a-step-icon { background: var(--teal-light); border-color: var(--teal); }
+.a-step.active .a-step-icon svg { stroke: var(--teal); }
+.a-step-icon svg { width: 18px; height: 18px; stroke: var(--text-soft); stroke-width: 1.75; fill: none; }
+.a-step-label { font-size: 11px; font-weight: 400; color: var(--text-mid); text-align: center; line-height: 1.3; }
+.a-step.active .a-step-label { color: var(--teal); font-weight: 500; }
+
+/* FORM BODY */
+.a-body { max-width: 720px; margin: 0 auto; padding: 32px 24px 120px; }
+.a-section { display: none; animation: fadeUp 0.35s ease; }
+.a-section.active { display: block; }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+/* SECTION HEADER */
+.a-sec-header {
+  background: white; border-radius: var(--radius); border: 1px solid var(--border);
+  padding: 24px 28px; margin-bottom: 16px;
+  display: flex; align-items: flex-start; justify-content: space-between;
+}
+.a-sec-eyebrow { font-size: 11px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--teal); margin-bottom: 6px; }
+.a-sec-title { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 700; color: var(--dark); line-height: 1.15; }
+.a-sec-sub { font-size: 14px; font-weight: 300; color: var(--text-mid); margin-top: 6px; line-height: 1.6; }
+.a-sec-badge { background: var(--teal-light); color: var(--teal-dark); font-size: 12px; font-weight: 500; padding: 4px 12px; border-radius: 50px; white-space: nowrap; margin-left: 16px; flex-shrink: 0; }
+
+/* QUESTION CARD */
+.q-card {
+  background: white; border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 24px 28px; margin-bottom: 12px;
+  transition: border-color 0.2s;
+}
+.q-card:focus-within { border-color: var(--teal-mid); }
+.q-label { font-size: 15px; font-weight: 500; color: var(--dark); margin-bottom: 4px; line-height: 1.45; }
+.q-hint { font-size: 13px; font-weight: 300; color: var(--text-soft); margin-bottom: 16px; font-style: italic; }
+.req { color: var(--teal); margin-left: 2px; }
+
+/* OPTIONS */
+.opts-col { display: flex; flex-direction: column; gap: 7px; }
+.opts-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 7px; }
+
+.opt-item { position: relative; cursor: pointer; }
+.opt-item input { position: absolute; opacity: 0; width: 0; height: 0; }
+.opt-face {
+  display: flex; align-items: center; gap: 10px;
+  padding: 11px 14px; border: 1px solid var(--border);
+  border-radius: var(--radius-sm); font-size: 14px; font-weight: 300;
+  color: var(--text); background: var(--bg); cursor: pointer; transition: all 0.15s;
+  line-height: 1.3;
+}
+.opt-dot {
+  width: 18px; height: 18px; border-radius: 50%;
+  border: 1.5px solid var(--border-mid); background: white;
+  flex-shrink: 0; transition: all 0.15s;
+}
+.opt-item.checkbox .opt-dot { border-radius: 4px; }
+.opt-face:hover { border-color: var(--teal-mid); background: #F0FBFF; }
+.opt-item input:checked + .opt-face { border-color: var(--teal); background: var(--teal-light); color: var(--teal-dark); font-weight: 400; }
+.opt-item input:checked + .opt-face .opt-dot { background: var(--teal); border-color: var(--teal); }
+.opt-item input:checked + .opt-face .opt-dot::after {
+  content: ''; display: block; width: 8px; height: 8px;
+  background: white; border-radius: 50%;
+  margin: 3px auto; border-radius: 50%;
+}
+.opt-item.checkbox input:checked + .opt-face .opt-dot::after {
+  content: ''; display: block; width: 10px; height: 8px;
+  background: none; border-bottom: 2px solid white; border-right: 2px solid white;
+  transform: rotate(45deg) translate(-2px, -1px);
+  border-radius: 0; margin: 1px 2px;
+}
+
+/* SCALE */
+.scale-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+.scale-btn {
+  width: 44px; height: 44px; border: 1px solid var(--border);
+  background: var(--bg); color: var(--text-mid);
+  font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 400;
+  border-radius: var(--radius-sm); cursor: pointer; transition: all 0.15s;
+}
+.scale-btn:hover { border-color: var(--teal); color: var(--teal); background: var(--teal-light); }
+.scale-btn.sel { background: var(--teal); border-color: var(--teal); color: white; font-weight: 500; }
+.scale-labels { display: flex; justify-content: space-between; margin-top: 8px; font-size: 11px; color: var(--text-soft); font-style: italic; }
+
+/* SLIDER */
+.slider-wrap { padding: 8px 4px 0; }
+.slider-track { position: relative; padding: 12px 0; }
+.slider-input {
+  -webkit-appearance: none; appearance: none;
+  width: 100%; height: 4px; border-radius: 4px; outline: none; cursor: pointer;
+  background: linear-gradient(to right, var(--teal) 0%, var(--teal) 50%, var(--border) 50%, var(--border) 100%);
+  transition: background 0.1s;
+}
+.slider-input::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none;
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--teal); border: 3px solid white;
+  box-shadow: 0 2px 8px rgba(8,145,178,0.35); cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.slider-input::-webkit-slider-thumb:hover { transform: scale(1.15); box-shadow: 0 3px 12px rgba(8,145,178,0.5); }
+.slider-input::-moz-range-thumb {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--teal); border: 3px solid white;
+  box-shadow: 0 2px 8px rgba(8,145,178,0.35); cursor: pointer;
+}
+.slider-value-row { display: flex; justify-content: space-between; align-items: center; margin-top: 4px; }
+.slider-value {
+  font-size: 28px; font-family: 'Playfair Display', serif; font-weight: 700;
+  color: var(--teal); min-width: 48px; text-align: center;
+  transition: transform 0.15s;
+}
+.slider-ticks { display: flex; justify-content: space-between; padding: 0 2px; margin-top: 6px; }
+.slider-tick { font-size: 11px; color: var(--text-soft); }
+
+/* TEXTAREA */
+.q-textarea {
+  width: 100%; border: 1px solid var(--border); border-radius: var(--radius-sm);
+  padding: 12px 16px; font-family: 'DM Sans', sans-serif; font-size: 14px;
+  font-weight: 300; color: var(--text); background: var(--bg);
+  resize: vertical; min-height: 96px; outline: none; transition: border-color 0.15s;
+  line-height: 1.65;
+}
+.q-textarea::placeholder { color: var(--text-soft); }
+.q-textarea:focus { border-color: var(--teal); background: white; }
+
+/* TEXT INPUT */
+.q-input {
+  width: 100%; border: 1px solid var(--border); border-radius: var(--radius-sm);
+  padding: 12px 16px; font-family: 'DM Sans', sans-serif; font-size: 14px;
+  font-weight: 300; color: var(--text); background: var(--bg);
+  outline: none; transition: border-color 0.15s;
+}
+.q-input::placeholder { color: var(--text-soft); }
+.q-input:focus { border-color: var(--teal); background: white; }
+.field-lbl { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-mid); margin-bottom: 6px; display: block; }
+.field-group { margin-bottom: 16px; }
+.fields-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+/* NAV */
+.a-nav {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 90;
+  background: white; border-top: 1px solid var(--border);
+  padding: 14px 32px; display: flex; align-items: center; justify-content: space-between;
+}
+.a-nav-info { font-size: 12px; color: var(--text-soft); }
+.nav-back {
+  background: none; border: 1px solid var(--border);
+  color: var(--text-mid); font-family: 'DM Sans', sans-serif; font-size: 14px;
+  font-weight: 400; padding: 11px 24px; border-radius: 50px; cursor: pointer;
+  transition: all 0.15s;
+}
+.nav-back:hover { border-color: var(--border-mid); color: var(--dark); }
+.nav-next {
+  background: var(--teal); border: none; color: white;
+  font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500;
+  padding: 11px 28px; border-radius: 50px; cursor: pointer;
+  display: flex; align-items: center; gap: 8px; transition: all 0.2s;
+}
+.nav-next:hover { background: var(--teal-dark); }
+.nav-next svg { width: 15px; height: 15px; }
+
+/* ERROR */
+.err-msg { display: none; background: #FEF2F2; border: 1px solid #FECACA; color: #DC2626; font-size: 13px; padding: 10px 14px; border-radius: var(--radius-sm); margin-top: 8px; }
+.err-msg.show { display: block; }
+
+/* SENDING */
+.overlay {
+  display: none; position: fixed; inset: 0; z-index: 999;
+  background: rgba(12,27,46,0.85); backdrop-filter: blur(4px);
+  flex-direction: column; align-items: center; justify-content: center; gap: 16px;
+}
+.overlay.show { display: flex; }
+.spinner { width: 48px; height: 48px; border: 2px solid rgba(255,255,255,0.2); border-top-color: var(--teal); border-radius: 50%; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.overlay-text { color: rgba(255,255,255,0.7); font-size: 14px; font-weight: 300; letter-spacing: 0.05em; }
+
+/* SUCCESS */
+.success-page {
+  display: none !important; min-height: 100vh; background: var(--bg);
+  flex-direction: column; align-items: center; justify-content: center;
+  padding: 48px 24px; text-align: center;
+}
+.success-page.show { display: flex !important; }
+.success-icon-wrap {
+  width: 80px; height: 80px; border-radius: 50%;
+  background: #DCFCE7; border: 2px solid #86EFAC;
+  display: flex; align-items: center; justify-content: center; margin-bottom: 28px;
+}
+.success-icon-wrap svg { width: 36px; height: 36px; stroke: #16A34A; stroke-width: 2; fill: none; }
+.success-title { font-family: 'Playfair Display', serif; font-size: 40px; font-weight: 700; color: var(--dark); margin-bottom: 14px; line-height: 1.1; }
+.success-title em { font-style: italic; color: var(--teal); }
+.success-sub { font-size: 16px; font-weight: 300; color: var(--text-mid); line-height: 1.75; max-width: 480px; margin: 0 auto 36px; }
+.success-card {
+  background: white; border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 28px 32px; max-width: 480px; width: 100%; text-align: left; margin-bottom: 16px;
+}
+.success-card-tag { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.12em; color: var(--gold); margin-bottom: 10px; }
+.success-card-title { font-size: 17px; font-weight: 500; color: var(--dark); margin-bottom: 8px; }
+.success-card-sub { font-size: 14px; font-weight: 300; color: var(--text-mid); line-height: 1.7; margin-bottom: 20px; }
+.btn-schedule {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--teal); color: white; text-decoration: none;
+  font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500;
+  padding: 12px 24px; border-radius: 50px; transition: all 0.2s;
+}
+.btn-schedule:hover { background: var(--teal-dark); }
+.btn-schedule svg { width: 15px; height: 15px; }
+.success-note { font-size: 12px; color: var(--text-soft); font-style: italic; margin-top: 12px; }
+
+@media (max-width: 640px) {
+  .l-nav { padding: 16px 20px; }
+  .l-hero-content { padding: 0 20px; }
+  .l-hero-trust { left: 20px; right: 20px; flex-wrap: wrap; gap: 12px; }
+  .l-how { padding: 64px 20px; }
+  .l-cta { padding: 64px 20px; }
+  .l-footer { padding: 20px; flex-direction: column; gap: 8px; text-align: center; }
+  .a-header { padding: 0 16px; }
+  .a-steps { padding: 0 16px; }
+  .a-body { padding: 20px 16px 120px; }
+  .a-nav { padding: 12px 20px; }
+  .a-sec-header { flex-direction: column; gap: 10px; }
+  .fields-2 { grid-template-columns: 1fr; }
+  .q-card { padding: 20px 18px; }
+  .opts-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="overlay" id="overlay">
+  <div class="spinner"></div>
+  <div class="overlay-text">Enviando sua anamnese…</div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     LANDING PAGE
+═══════════════════════════════════════ -->
+<div id="landing">
+
+  <nav class="l-nav">
+    <div class="l-nav-logo"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAZAAAABzCAYAAAC2GFRUAAAvbUlEQVR4nO2deZBV9ZXHv/e9+/beAAVFowRKQAybCtQoGjWDA5YKTrlkjJnBgGNwz2BFk9SMU1ZmrFSS0RknEjOkxlJJwpQsiRkji+i4EAckgAwgKrIIajfQ9PKW++525o/m/Pp3b7/uvo2NdDfnU9XV772+y+/+Hpzz+50VEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEAShT2IYBgzDiHx8IpE4gaPpH0SfLUEQhAGGYRggog6fx2IxxONxeJ6njgMAIoLv+1/oGAVBEIQ+TNTdh2EYiMViPdqpDGTMkz0AQRCEkw0rEN6NdLbL4L/rO5JTGVGjgiCcspimCc/zAoogHo8rBeF5HmKxmHotCIIgCD2mp072UwGZDUEQTnnYr8E7kXg8rnYipVIpcBybt/TXpyriAxEE4ZSFzVO6IqiursawYcMwePBgOnr0qFFfX4+WlpYO557q/g9BEAYAptm2DtRNLCwY4/G4Ok637evHmKapPtevwb+z2Wzgfpz/kE6ne/1ZThb6M3/ta18j3/fVz8SJEzscJ7QRO9kDEATh+DFNE67rIhaLqRVxLpeD7/tIJpPwPE+FnurOYja/6E5kNuEQEdLptPpdLBYDSspxHBiGAcuyTtpzC30DUSCC0I9xXRdA226AlUihUAAA2LYNoH2nAbQpHNM0lclGjywiIlRVVQWUg2VZSpno18pkMif4yYT+gPhABKGfk8lkUCwWAbTtELLZLH7zm9/QoEGDQETwPA+u68I0TSQSCdi2DcdxkEwmYZomGhoaAACrV6/G8uXLDdu2Yds2EokEMpmMsv9XV1ejtbUV8XgcxWIxkKktCIIg9EOSySSA9sghACAicl03YMsnIvJ9n2zbJtd1iYjIcRwql8vkOA7xOWvXrqWrr75aeYirqqoAtPk+wj6VgYL4QARBOOVIpVIAOgpzVg5ERLZtk+d55Ps+WZZFtm1XVCSsYIiIisUiPf7445TJ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" alt="Paulo França"></div>
+  </nav>
+
+  <section class="l-hero">
+    <!-- Silhueta de São Paulo -->
+    <svg class="l-skyline" viewBox="0 0 1440 320" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMax slice">
+      <path d="M0,280 L0,230 L30,230 L30,200 L50,200 L50,180 L60,180 L60,160 L70,160 L70,180 L90,180 L90,150 L100,150 L100,130 L110,130 L110,150 L120,150 L120,170 L140,170 L140,140 L150,140 L150,120 L155,120 L155,110 L160,110 L160,120 L165,120 L165,140 L180,140 L180,160 L200,160 L200,130 L210,130 L210,100 L215,100 L215,85 L220,85 L220,100 L225,100 L225,130 L240,130 L240,150 L260,150 L260,120 L270,120 L270,90 L275,90 L275,75 L278,75 L278,65 L282,65 L282,75 L285,75 L285,90 L295,90 L295,110 L310,110 L310,80 L320,80 L320,55 L325,55 L325,40 L330,40 L330,55 L335,55 L335,80 L345,80 L345,110 L360,110 L360,130 L380,130 L380,100 L390,100 L390,75 L398,75 L398,60 L402,60 L402,75 L410,75 L410,100 L430,100 L430,120 L450,120 L450,90 L460,90 L460,70 L465,70 L465,55 L470,55 L470,70 L478,70 L478,90 L490,90 L490,115 L510,115 L510,85 L520,85 L520,60 L528,60 L528,45 L532,45 L532,60 L540,60 L540,85 L560,85 L560,110 L580,110 L580,80 L590,80 L590,55 L598,55 L598,40 L602,40 L602,55 L610,55 L610,80 L630,80 L630,105 L650,105 L650,75 L660,75 L660,50 L668,50 L668,35 L672,35 L672,50 L680,50 L680,75 L700,75 L700,100 L720,100 L720,70 L730,70 L730,45 L738,45 L738,30 L742,30 L742,45 L750,45 L750,70 L770,70 L770,95 L790,95 L790,65 L800,65 L800,40 L808,40 L808,25 L812,25 L812,40 L820,40 L820,65 L840,65 L840,90 L860,90 L860,60 L870,60 L870,35 L878,35 L878,20 L882,20 L882,35 L890,35 L890,60 L910,60 L910,85 L930,85 L930,110 L950,110 L950,80 L960,80 L960,55 L968,55 L968,40 L972,40 L972,55 L980,55 L980,80 L1000,80 L1000,105 L1020,105 L1020,130 L1040,130 L1040,100 L1050,100 L1050,75 L1058,75 L1058,60 L1062,60 L1062,75 L1070,75 L1070,100 L1090,100 L1090,120 L1110,120 L1110,90 L1120,90 L1120,65 L1128,65 L1128,50 L1132,50 L1132,65 L1140,65 L1140,90 L1160,90 L1160,115 L1180,115 L1180,140 L1200,140 L1200,160 L1220,160 L1220,180 L1240,180 L1240,200 L1280,200 L1280,220 L1320,220 L1320,240 L1360,240 L1360,260 L1440,260 L1440,320 L0,320 Z" fill="rgba(5,15,28,0.75)"/>
+      <path d="M0,300 L0,260 L60,260 L60,240 L120,240 L120,220 L200,220 L200,240 L280,240 L280,210 L350,210 L350,230 L440,230 L440,250 L520,250 L520,230 L600,230 L600,215 L680,215 L680,235 L760,235 L760,255 L840,255 L840,235 L920,235 L920,220 L1000,220 L1000,240 L1080,240 L1080,255 L1160,255 L1160,240 L1240,240 L1240,260 L1320,260 L1320,280 L1440,280 L1440,320 L0,320 Z" fill="rgba(4,12,22,0.6)"/>
+    </svg>
+    <div class="l-hero-content">
+      <div class="l-hero-badge">Processo Consultivo Personalizado</div>
+      <h1 class="l-hero-title">
+        Anamnese
+        <span class="l-hero-title-gold">Imobiliária</span>
+      </h1>
+      <p class="l-hero-sub">Uma abordagem consultiva e estratégica que antecede qualquer recomendação de imóvel. Inspirada na prática médica, coletamos informações profundas para mapear seu perfil antes de apresentar soluções.</p>
+      <div class="l-hero-actions">
+        <button class="btn-primary" onclick="showApp()">
+          Iniciar Anamnese
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+        <button class="btn-outline" onclick="document.getElementById('como-funciona').scrollIntoView({behavior:'smooth'})">Saiba Mais</button>
+      </div>
+    </div>
+    <div class="l-hero-trust">
+      <div class="l-trust-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+        3–5 min para concluir
+      </div>
+      <div class="l-trust-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        Dados 100% seguros
+      </div>
+      <div class="l-trust-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+        Consultoria especializada
+      </div>
+    </div>
+  </section>
+
+  <section class="l-how" id="como-funciona">
+    <div class="l-section-label">Metodologia</div>
+    <h2 class="l-section-title">Como Funciona</h2>
+    <p class="l-section-sub">Um processo estruturado em cinco pilares fundamentais para encontrar o imóvel ideal para seu momento de vida.</p>
+    <div class="l-pillars">
+      <div class="l-pillar">
+        <div class="l-pillar-num">1</div>
+        <div class="l-pillar-name">Motivação e Momento de Vida</div>
+        <div class="l-pillar-desc">Compreendemos as razões emocionais e subjetivas que impulsionam sua busca.</div>
+      </div>
+      <div class="l-pillar">
+        <div class="l-pillar-num">2</div>
+        <div class="l-pillar-name">Capacidade e Estratégia Patrimonial</div>
+        <div class="l-pillar-desc">Analisamos situação financeira e objetivos patrimoniais de longo prazo.</div>
+      </div>
+      <div class="l-pillar">
+        <div class="l-pillar-num">3</div>
+        <div class="l-pillar-name">Necessidades Reais e Funcionais</div>
+        <div class="l-pillar-desc">Mapeamos de requisitos práticos relacionados à rotina e características do imóvel.</div>
+      </div>
+      <div class="l-pillar">
+        <div class="l-pillar-num">4</div>
+        <div class="l-pillar-name">Expectativas e Experiência</div>
+        <div class="l-pillar-desc">Identificamos histórico de compras e como você prefere tomar decisões.</div>
+      </div>
+      <div class="l-pillar">
+        <div class="l-pillar-num">5</div>
+        <div class="l-pillar-name">Visão de Futuro e Legado</div>
+        <div class="l-pillar-desc">Avaliamos horizontes de permanência e atributos para recomendar imóveis alinhados ao seu futuro.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="l-cta">
+    <h2 class="l-cta-title">Pronto para <em>Começar?</em></h2>
+    <p class="l-cta-sub">Sua jornada para encontrar o imóvel ideal começa aqui.</p>
+    <button class="btn-primary" onclick="showApp()" style="margin: 0 auto;">
+      Iniciar Anamnese Agora
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </button>
+  </section>
+
+  <footer class="l-footer">
+    <div class="l-footer-logo"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAZAAAABzCAYAAAC2GFRUAAAvbUlEQVR4nO2deZBV9ZXHv/e9+/beAAVFowRKQAybCtQoGjWDA5YKTrlkjJnBgGNwz2BFk9SMU1ZmrFSS0RknEjOkxlJJwpQsiRkji+i4EAckgAwgKrIIajfQ9PKW++525o/m/Pp3b7/uvo2NdDfnU9XV772+y+/+Hpzz+50VEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEAShT2IYBgzDiHx8IpE4gaPpH0SfLUEQhAGGYRggog6fx2IxxONxeJ6njgMAIoLv+1/oGAVBEIQ+TNTdh2EYiMViPdqpDGTMkz0AQRCEkw0rEN6NdLbL4L/rO5JTGVGjgiCcspimCc/zAoogHo8rBeF5HmKxmHotCIIgCD2mp072UwGZDUEQTnnYr8E7kXg8rnYipVIpcBybt/TXpyriAxEE4ZSFzVO6IqiursawYcMwePBgOnr0qFFfX4+WlpYO557q/g9BEAYAptm2DtRNLCwY4/G4Ok637evHmKapPtevwb+z2Wzgfpz/kE6ne/1ZThb6M3/ta18j3/fVz8SJEzscJ7QRO9kDEATh+DFNE67rIhaLqRVxLpeD7/tIJpPwPE+FnurOYja/6E5kNuEQEdLptPpdLBYDSspxHBiGAcuyTtpzC30DUSCC0I9xXRdA226AlUihUAAA2LYNoH2nAbQpHNM0lclGjywiIlRVVQWUg2VZSpno18pkMif4yYT+gPhABKGfk8lkUCwWAbTtELLZLH7zm9/QoEGDQETwPA+u68I0TSQSCdi2DcdxkEwmYZomGhoaAACrV6/G8uXLDdu2Yds2EokEMpmMsv9XV1ejtbUV8XgcxWIxkKktCIIg9EOSySSA9sghACAicl03YMsnIvJ9n2zbJtd1iYjIcRwql8vkOA7xOWvXrqWrr75aeYirqqoAtPk+wj6VgYL4QARBOOVIpVIAOgpzVg5ERLZtk+d55Ps+WZZFtm1XVCSsYIiIisUiPf7445TJ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" alt="Paulo França"></div>
+    <div class="l-footer-copy">© 2025 Paulo França. Consultoria imobiliária especializada.</div>
+  </footer>
+</div>
+
+<!-- ═══════════════════════════════════════
+     FORM APP
+═══════════════════════════════════════ -->
+<div id="app">
+
+  <!-- Header -->
+  <header class="a-header">
+    <button class="a-header-back" onclick="goBack()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      Voltar
+    </button>
+    <div class="a-header-title"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAZAAAABzCAYAAAC2GFRUAAAvbUlEQVR4nO2deZBV9ZXHv/e9+/beAAVFowRKQAybCtQoGjWDA5YKTrlkjJnBgGNwz2BFk9SMU1ZmrFSS0RknEjOkxlJJwpQsiRkji+i4EAckgAwgKrIIajfQ9PKW++525o/m/Pp3b7/uvo2NdDfnU9XV772+y+/+Hpzz+50VEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEAShT2IYBgzDiHx8IpE4gaPpH0SfLUEQhAGGYRggog6fx2IxxONxeJ6njgMAIoLv+1/oGAVBEIQ+TNTdh2EYiMViPdqpDGTMkz0AQRCEkw0rEN6NdLbL4L/rO5JTGVGjgiCcspimCc/zAoogHo8rBeF5HmKxmHotCIIgCD2mp072UwGZDUEQTnnYr8E7kXg8rnYipVIpcBybt/TXpyriAxEE4ZSFzVO6IqiursawYcMwePBgOnr0qFFfX4+WlpYO557q/g9BEAYAptm2DtRNLCwY4/G4Ok637evHmKapPtevwb+z2Wzgfpz/kE6ne/1ZThb6M3/ta18j3/fVz8SJEzscJ7QRO9kDEATh+DFNE67rIhaLqRVxLpeD7/tIJpPwPE+FnurOYja/6E5kNuEQEdLptPpdLBYDSspxHBiGAcuyTtpzC30DUSCC0I9xXRdA226AlUihUAAA2LYNoH2nAbQpHNM0lclGjywiIlRVVQWUg2VZSpno18pkMif4yYT+gPhABKGfk8lkUCwWAbTtELLZLH7zm9/QoEGDQETwPA+u68I0TSQSCdi2DcdxkEwmYZomGhoaAACrV6/G8uXLDdu2Yds2EokEMpmMsv9XV1ejtbUV8XgcxWIxkKktCIIg9EOSySSA9sghACAicl03YMsnIvJ9n2zbJtd1iYjIcRwql8vkOA7xOWvXrqWrr75aeYirqqoAtPk+wj6VgYL4QARBOOVIpVIAOgpzVg5ERLZtk+d55Ps+WZZFtm1XVCSsYIiIisUiPf7445TJ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" alt="Paulo França" style="height:30px;width:auto;filter:brightness(0) saturate(100%);"></div>
+    <div class="a-header-right">
+      <div class="a-time">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+        <span id="timeEst">~15 min restantes</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Progress bar -->
+  <div class="a-progress-bar"><div class="a-progress-fill" id="progressFill" style="width:0%"></div></div>
+
+  <!-- Step indicators -->
+  <div class="a-steps">
+    <div class="a-steps-inner">
+      <div class="a-step active" id="step-ind-1">
+        <div class="a-step-icon">
+          <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+        </div>
+        <div class="a-step-label">Motivação</div>
+      </div>
+      <div class="a-step" id="step-ind-2">
+        <div class="a-step-icon">
+          <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+        </div>
+        <div class="a-step-label">Patrimonial</div>
+      </div>
+      <div class="a-step" id="step-ind-3">
+        <div class="a-step-icon">
+          <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        </div>
+        <div class="a-step-label">Funcional</div>
+      </div>
+      <div class="a-step" id="step-ind-4">
+        <div class="a-step-icon">
+          <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        </div>
+        <div class="a-step-label">Experiência</div>
+      </div>
+      <div class="a-step" id="step-ind-5">
+        <div class="a-step-icon">
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        </div>
+        <div class="a-step-label">Legado</div>
+      </div>
+      <div class="a-step" id="step-ind-6">
+        <div class="a-step-icon">
+          <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+        <div class="a-step-label">Contato</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Form body -->
+  <div class="a-body">
+
+    <!-- ── SEÇÃO 1: MOTIVAÇÃO ── -->
+    <div class="a-section active" id="s1">
+      <div class="a-sec-header">
+        <div>
+          <div class="a-sec-eyebrow">Pilar I</div>
+          <div class="a-sec-title">Motivação</div>
+          <div class="a-sec-sub">Momento de vida e aspectos emocionais</div>
+        </div>
+        <div class="a-sec-badge">7 questões</div>
+      </div>
+
+      <div class="q-card">
+        <div class="q-label">O que motivou sua busca por um novo imóvel neste momento?<span class="req">*</span></div>
+        <div class="q-hint">Entender sua motivação nos ajuda a encontrar opções mais alinhadas ao seu momento.</div>
+        <div class="opts-col">
+          <label class="opt-item"><input type="radio" name="q1_1"><span class="opt-face"><span class="opt-dot"></span>Mudança de cidade</span></label>
+          <label class="opt-item"><input type="radio" name="q1_1"><span class="opt-face"><span class="opt-dot"></span>Crescimento da família</span></label>
+          <label class="opt-item"><input type="radio" name="q1_1"><span class="opt-face"><span class="opt-dot"></span>Busca por mais espaço</span></label>
+          <label class="opt-item"><input type="radio" name="q1_1"><span class="opt-face"><span class="opt-dot"></span>Desejo de um novo estilo de vida</span></label>
+          <label class="opt-item"><input type="radio" name="q1_1"><span class="opt-face"><span class="opt-dot"></span>Investimento patrimonial</span></label>
+          <label class="opt-item"><input type="radio" name="q1_1"><span class="opt-face"><span class="opt-dot"></span>Mudança de emprego</span></label>
+          <label class="opt-item"><input type="radio" name="q1_1"><span class="opt-face"><span class="opt-dot"></span>Outros</span></label>
+        </div>
+      </div>
+
+      <div class="q-card">
+        <div class="q-label">Como você se sente em relação ao lugar onde mora hoje?<span class="req">*</span></div>
+        <div class="opts-col">
+          <label class="opt-item"><input type="radio" name="q1_2"><span class="opt-face"><span class="opt-dot"></span>Muito satisfeito</span></label>
+          <label class="opt-item"><input type="radio" name="q1_2"><span class="opt-face"><span class="opt-dot"></span>Satisfeito, mas com algumas limitações</span></label>
+          <label class="opt-item"><input type="radio" name="q1_2"><span class="opt-face"><span class="opt-dot"></span>Insatisfeito — espaço apertado</span></label>
+          <label class="opt-item"><input type="radio" name="q1_2"><span class="opt-face"><span class="opt-dot"></span>Insatisfeito — questões de segurança</span></label>
+          <label class="opt-item"><input type="radio" name="q1_2"><span class="opt-face"><span class="opt-dot"></span>Insatisfeito — localização inadequada</span></label>
+          <label class="opt-item"><input type="radio" name="q1_2"><span class="opt-face"><span class="opt-dot"></span>Muito insatisfeito</span></label>
+        </div>
+      </div>
+
+      <div class="q-card">
+        <div class="q-label">Que tipo de sensação você espera ao entrar no novo imóvel?<span class="req">*</span></div>
+        <div class="q-hint">Pode selecionar múltiplas opções.</div>
+        <div class="opts-grid">
+          <label class="opt-item checkbox"><input type="checkbox" name="q1_3"><span class="opt-face"><span class="opt-dot"></span>Acolhimento e conforto</span></label>
+          <label class="opt-item checkbox"><input type="checkbox" name="q1_3"><span class="opt-face"><span class="opt-dot"></span>Tranquilidade e paz</span></label>
+          <label class="opt-item checkbox"><input type="checkbox" name="q1_3"><span class="opt-face"><span class="opt-dot"></span>Inspiração e criatividade</span></label>
+          <label class="opt-item checkbox"><input type="checkbox" name="q1_3"><span class="opt-face"><span class="opt-dot"></span>Modernidade e sofisticação</span></label>
+          <label class="opt-item checkbox"><input type="checkbox" name="q1_3"><span class="opt-face"><span class="opt-dot"></span>Conexão com a natureza</span></label>
+          <label class="opt-item checkbox"><input type="checkbox" name="q1_3"><span class="opt-face"><span class="opt-dot"></span>Sensação de segurança</span></label>
+          <label class="opt-item checkbox"><input type="checkbox" name="q1_3"><span class="opt-face"><span class="opt-dot"></span>Amplitude e liberdade</span></label>
+        </div>
+      </div>
+
+      <div class="q-card">
+        <div class="q-label">Existe alguma mudança pessoal ou familiar que influenciou essa decisão?</div>
+        <div class="opts-grid">
+          <label class="opt-item"><input type="radio" name="q1_4"><span class="opt-face"><span class="opt-dot"></span>Casamento ou união estável</span></label>
+          <label class="opt-item"><input type="radio" name="q1_4"><span class="opt-face"><span class="opt-dot"></span>Nascimento ou adoção de filhos</span></label>
+          <label class="opt-item"><input type="radio" name="q1_4"><span class="opt-face"><span class="opt-dot"></span>Filhos saindo de casa</span></label>
+          <label class="opt-item"><input type="radio" name="q1_4"><span class="opt-face"><span class="opt-dot"></span>Divórcio ou separação</span></label>
+          <label class="opt-item"><input type="radio" name="q1_4"><span class="opt-face"><span class="opt-dot"></span>Aposentadoria</span></label>
+          <label class="opt-item"><input type="radio" name="q1_4"><span class="opt-face"><span class="opt-dot"></span>Mudança de emprego</span></label>
+          <label class="opt-item"><input type="radio" name="q1_4"><span class="opt-face"><span class="opt-dot"></span>Questões de saúde</span></label>
+          <label class="opt-item"><input type="radio" name="q1_4"><span class="opt-face"><span class="opt-dot"></span>Não se aplica</span></label>
+        </div>
+      </div>
+
+      <div class="q-card">
+        <div class="q-label">Quais valores você quer ver refletidos no seu novo lar?<span class="req">*</span></div>
+        <div class="opts-grid">
+          <label class="opt-item checkbox"><input type="checkbox" name="q1_5"><span class="opt-face"><span class="opt-dot"></span>Sustentabilidade</span></label>
+          <label class="opt-item checkbox"><input type="checkbox" name="q1_5"><span class="opt-face"><span class="opt-dot"></span>Senso de comunidade</span></label>
+          <label class="opt-item checkbox"><input type="checkbox" name="q1_5"><span class="opt-face"><span class="opt-dot"></span>Privacidade e exclusividade</span></label>
+          <label class="opt-item checkbox"><input type="checkbox" name="q1_5"><span class="opt-face"><span class="opt-dot"></span>Luxo e sofisticação</span></label>
+          <label class="opt-item checkbox"><input type="checkbox" name="q1_5"><span class="opt-face"><span class="opt-dot"></span>Simplicidade e minimalismo</span></label>
+          <label class="opt-item checkbox"><input type="checkbox" name="q1_5"><span class="opt-face"><span class="opt-dot"></span>Funcionalidade e praticidade</span></label>
+          <label class="opt-item checkbox"><input type="checkbox" name="q1_5"><span class="opt-face"><span class="opt-dot"></span>História e tradição</span></label>
+          <label class="opt-item checkbox"><input type="checkbox" name="q1_5"><span class="opt-face"><span class="opt-dot"></span>Inovação e tecnologia</span></label>
+        </div>
+      </div>
+
+      <div class="q-card">
+        <div class="q-label">Como o novo imóvel se alinha aos seus planos de vida nos próximos 5–10 anos?<span class="req">*</span></div>
+        <div class="q-hint">Pense em seus planos para o médio e longo prazo.</div>
+        <textarea class="q-textarea" id="q1_6" placeholder="Compartilhe sua visão com liberdade…"></textarea>
+      </div>
+
+      <div class="q-card">
+        <div class="q-label">Em uma escala de 1 a 10, qual a importância do imóvel para sua qualidade de vida?<span class="req">*</span></div>
+        <div class="slider-wrap">
+          <div class="slider-track">
+            <input type="range" class="slider-input" id="sl_q1_7" min="1" max="10" value="5" data-sc="q1_7">
+          </div>
+          <div class="slider-value-row">
+            <span class="scale-labels" style="flex:1; margin-top:0;"><span>Pouco importante</span><span>Extremamente importante</span></span>
+          </div>
+          <div style="text-align:center; margin-top:8px;">
+            <span class="slider-value" id="sv_q1_7">5</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="a-nav">
+        <button class="nav-back" onclick="goBack()">← Voltar</button>
+        <div class="a-nav-info">Etapa 1 de 6</div>
+        <button class="nav-next" onclick="goTo(2)">Próximo <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+      </div>
+    </div>
+
+    <!-- ── SEÇÃO 2: PATRIMONIAL ── -->
+    <div class="a-section" id="s2">
+      <div class="a-sec-header">
+        <div>
+          <div class="a-sec-eyebrow">Pilar II</div>
+          <div class="a-sec-title">Patrimonial</div>
+          <div class="a-sec-sub">Capacidade e estratégia financeira</div>
+        </div>
+        <div class="a-sec-badge">9 questões</div>
+      </div>
+
+      <div class="q-card">
+        <div class="q-label">Esse imóvel será para moradia, investimento ou ambos?<span class="req">*</span></div>
+        <div class="opts-col">
+          <label class="opt-item"><input type="radio" name="q2_1"><span class="opt-face"><span class="opt-dot"></span>Moradia própria (principal prioridade)</span></label>
+          <label class="opt-item"><input type="radio" name="q2_1"><span class="opt-face"><span class="opt-dot"></span>Investimento (principal prioridade)</span></label>
+          <label class="opt-item"><input type="radio" name="q2_1"><span class="opt-face"><span class="opt-dot"></span>Ambos — moradia e investimento equilibrados</span></label>
+          <label class="opt-item"><input type="radio" name="q2_1"><span class="opt-face"><span class="opt-dot"></span>Inicialmente moradia, depois investimento</span></label>
+          <label class="opt-item"><input type="radio" name="q2_1"><span class="opt-face"><span class="opt-dot"></span>Inicialmente investimento, depois moradia</span></label>
+        </div>
+      </div>
+
+      <div class="q-card">
+        <div class="q-label">Qual é o valor que você pretende investir?<span class="req">*</span></div>
+        <div class="opts-col">
+          <label class="opt-item"><input type="radio" name="q2_2"><span class="opt-face"><span class="opt-dot"></span>Até R$ 500.000</span></label>
+          <label class="opt-item"><input type="radio" name="q2_2"><span class="opt-face"><span class="opt-dot"></span>R$ 500.000 – R$ 1.000.000</span></label>
+          <label class="opt-item"><input type="radio" name="q2_2"><span class="opt-face"><span class="opt-dot"></span>R$ 1.000.000 – R$ 2.000.000</span></label>
+          <label class="opt-item"><input type="radio" name="q2_2"><span class="opt-face"><span class="opt-dot"></span>R$ 2.000.000 – R$ 5.000.000</span></label>
+          <label class="opt-item"><input type="radio" name="q2_2"><span class="opt-face"><span class="opt-dot"></span>R$ 5.000.000 – R$ 10.000.000</span></label>
+          <label class="opt-item"><input type="radio" name="q2_2"><span class="opt-face"><span class="opt-dot"></span>Acima de R$ 10.000.000</span></label>
+          <label class="opt-item"><input type="radio" name="q2_2"><span class="opt-face"><span class="opt-dot"></span>Prefiro não informar</span></label>
+        </div>
+      </div>
+
+      <div class="q-card">
+        <div class="q-label">Há margem para negociação no valor?<span class="req">*</span></div>
+        <div class="opts-col">
+          <label class="opt-item"><input type="radio" name="q2_3"><span class="opt-face"><span class="opt-dot"></span>Valor fixo, sem margem</span></label>
+          <label class="opt-item"><input type="radio" name="q2_3"><span class="opt-face"><span class="opt-dot"></span>Margem de até 10%</span></label>
+          <label class="opt-item"><input type="radio" name="q2_3"><span class="opt-face"><span class="opt-dot"></span>Margem de até 20%</span></label>
+          <label class="opt-item"><input type="radio" name="q2_3"><span class="opt-face"><span class="opt-dot"></span>Margem de até 30%</span></label>
+          <label class="opt-item"><input type="radio" name="q2_3"><span class="opt-face"><span class="opt-dot"></span>Totalmente flexível</span></label>
+        </div>
+      </div>
+
+      <div class="q-card">
+        <div class="q-label">Você já possui outros imóveis?<span class="req">*</span></div>
+        <div class="opts-col">
+          <label class="opt-item"><input type="radio" name="q2_4"><span class="opt-face"><span class="opt-dot"></span>Não possuo outros imóveis</span></label>
+          <label class="opt-item"><input type="radio" name="q2_4"><span class="opt-face"><span class="opt-dot"></span>Possuo e pretendo manter</span></label>
+          <label class="opt-item"><input type="radio" name="q2_4"><span class="opt-face"><span class="opt-dot"></span>Possuo e pretendo vender</span></label>
+          <label class="opt-item"><input type="radio" name="q2_4"><span class="opt-face"><span class="opt-dot"></span>Possuo e pretendo alugar</span></label>
+          <label class="opt-item"><input type="radio" name="q2_4"><span class="opt-face"><span class="opt-dot"></span>Possuo múltiplos imóveis</span></label>
+        </div>
+      </div>
+
+      <div class="q-card">
+        <div class="q-label">Prefere imóveis prontos, em construção ou lançamentos?<span class="req">*</span></div>
+        <div class="opts-col">
+          <label class="opt-item"><input type="radio" name="q2_5"><span class="opt-face"><span class="opt-dot"></span>Apenas prontos</span></label>
+          <label class="opt-item"><input type="radio" name="q2_5"><span class="opt-face"><span class="opt-dot"></span>Preferencialmente prontos</span></label>
+          <label class="opt-item"><input type="radio" name="q2_5"><span class="opt-face"><span class="opt-dot"></span>Preferencialmente em construção</span></label>
+          <label class="opt-item"><input type="radio" name="q2_5"><span class="opt-face"><span class="opt-dot"></span>Apenas lançamentos</span></label>
+          <label class="opt-item"><input type="radio" name="q2_5"><span class="opt-face"><span class="opt-dot"></span>Indiferente</span></label>
+        </div>
+      </div>
+
+      <div class="q-card">
+        <div class="q-label">Está buscando rentabilidade, proteção cambial, valorização ou liquidez?<span class="req">*</span></div>
+        <div class="opts-grid">
+          <label class="opt-item checkbox"><input type="checkbox" name="q2_6"><span class="opt-face"><span class="opt-dot"></span>Rentabilidade (aluguel)</span></label>
+          <label class="opt-item checkbox"><input type="checkbox" name="q2_6"><span class="opt-face"><span class="opt-dot"></span>Proteção cambial</span></label>
+          <label class="opt-item checkbox"><input type="checkbox" name="q2_6"><span class="opt-face"><span class="opt-dot"></span>Valorização de capital</span></label>
+          <label class="opt-item checkbox"><input type="checkbox" name="q2_6"><span class="opt-face"><span class="opt-dot"></span>Liquidez</span></label>
+          <label class="opt-item checkbox"><input type="checkbox" name="q2_6"><span class="opt-face"><span class="opt-dot"></span>Proteção patrimonial</span></label>
+          <label class="opt-item checkbox"><input type="checkbox" name="q2_6"><span class="opt-face"><span class="opt-dot"></span>Diversificação</span></label>
+        </div>
+      </div>
+
+      <div class="q-card">
+        <div class="q-label">Qual sua expectativa de retorno sobre o investimento anual?</div>
+        <div class="opts-col">
+          <label class="opt-item"><input type="radio" name="q2_7"><span class="opt-face"><span class="opt-dot"></span>Não se aplica</span></label>
+          <label class="opt-item"><input type="radio" name="q2_7"><span class="opt-face"><span class="opt-dot"></span>Apenas valorização</span></label>
+          <label class="opt-item"><input type="radio" name="q2_7"><span class="opt-face"><span class="opt-dot"></span>3–5% ao ano</span></label>
+          <label class="opt-item"><input type="radio" name="q2_7"><span class="opt-face"><span class="opt-dot"></span>5–8% ao ano</span></label>
+          <label class="opt-item"><input type="radio" name="q2_7"><span class="opt-face"><span class="opt-dot"></span>8–12% ao ano</span></label>
+          <label class="opt-item"><input type="radio" name="q2_7"><span class="opt-face"><span class="opt-dot"></span>Acima de 12%</span></label>
+        </div>
+      </div>
+
+      <div class="q-card">
+        <div class="q-label">Você tem planos de financiamento?<span class="req">*</span></div>
+        <div class="opts-col">
+          <label class="opt-item"><input type="radio" name="q2_8"><span class="opt-face"><span class="opt-dot"></span>Pagamento à vista</span></label>
+          <label class="opt-item"><input type="radio" name="q2_8"><span class="opt-face"><span class="opt-dot"></span>Financiamento até 30%</span></label>
+          <label class="opt-item"><input type="radio" name="q2_8"><span class="opt-face"><span class="opt-dot"></span>Financiamento até 50%</span></label>
+          <label class="opt-item"><input type="radio" name="q2_8"><span class="opt-face"><span class="opt-dot"></span>Financiamento até 70%</span></label>
+          <label class="opt-item"><input type="radio" name="q2_8"><span class="opt-face"><span class="opt-dot"></span>Financiamento máximo</span></label>
+          <label class="opt-item"><input type="radio" name="q2_8"><span class="opt-face"><span class="opt-dot"></span>Ainda não decidi</span></label>
+        </div>
+      </div>
+
+      <div class="q-card">
+        <div class="q-label">Qual sua tolerância a riscos no mercado imobiliário?<span class="req">*</span></div>
+        <div class="opts-col">
+          <label class="opt-item"><input type="radio" name="q2_9"><span class="opt-face"><span class="opt-dot"></span>Muito conservador</span></label>
+          <label class="opt-item"><input type="radio" name="q2_9"><span class="opt-face"><span class="opt-dot"></span>Conservador</span></label>
+          <label class="opt-item"><input type="radio" name="q2_9"><span class="opt-face"><span class="opt-dot"></span>Moderado</span></label>
+          <label class="opt-item"><input type="radio" name="q2_9"><span class="opt-face"><span class="opt-dot"></span>Arrojado</span></label>
+          <label class="opt-item"><input type="radio" name="q2_9"><span class="opt-face"><span class="opt-dot"></span>Muito arrojado</span></label>
+        </div>
+      </div>
+
+      <div class="a-nav">
+        <button class="nav-back" onclick="goTo(1)">← Voltar</button>
+        <div class="a-nav-info">Etapa 2 de 6</div>
+        <button class="nav-next" onclick="goTo(3)">Próximo <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+      </div>
+    </div>
+
+    <!-- ── SEÇÃO 3: FUNCIONAL ── -->
+    <div class="a-section" id="s3">
+      <div class="a-sec-header">
+        <div>
+          <div class="a-sec-eyebrow">Pilar III</div>
+          <div class="a-sec-title">Funcional</div>
+          <div class="a-sec-sub">Necessidades reais e práticas</div>
+        </div>
+        <div class="a-sec-badge">8 questões</div>
+      </div>
+
+      <div class="q-card">
+        <div class="q-label">Como é sua rotina diária? Quais locais você frequenta?<span class="req">*</span></div>
+        <div class="q-hint">Inclua trabalho, escola dos filhos, academia, parques, restaurantes, etc.</div>
+        <textarea class="q-textarea" id="q3_1" placeholder="Descreva sua rotina…"></textarea>
+      </div>
+
+      <div class="q-card">
+        <div class="q-label">Quantas pessoas vão morar no imóvel?<span class="req">*</span></div>
+        <div class="opts-col">
+          <label class="opt-item"><input type="radio" name="q3_2"><span class="opt-face"><span class="opt-dot"></span>1 pessoa</span></label>
+          <label class="opt-item"><input type="radio" name="q3_2"><span class="opt-face"><span class="opt-dot"></span>2 pessoas (casal)</span></label>
+          <label class="opt-item"><input type="radio" name="q3_2"><span class="opt-face"><span class="opt-dot"></span>3–4 pessoas</span></label>
+          <label class="opt-item"><input type="radio" name="q3_2"><span class="opt-face"><span class="opt-dot"></span>5–6 pessoas</span></label>
+          <label class="opt-item"><input type="radio" name="q3_2"><span class="opt-face"><span class="opt-dot"></span>Mais de 6</span></label>
+          <label class="opt-item"><input type="radio" name="q3_2"><span class="opt-face"><span class="opt-dot"></span>Variável</span></label>
+        </div>
+      </div>
+
+      <div class="q-card">
+        <div class="q-label">Há pets, funcionários domésticos ou necessidades especiais?</div>
+        <div class="opts-grid">
+          <label class="opt-item checkbox"><input type="checkbox" name="q3_3"><span class="opt-face"><span class="opt-dot"></span>Pets (cães)</span></label>
+          <label class="opt-item checkbox"><input type="checkbox" name="q3_3"><span class="opt-face"><span class="opt-dot"></span>Pets (gatos)</span></label>
+          <label class="opt-item checkbox"><input type="checkbox" name="q3_3"><span class="opt-face"><span class="opt-dot"></span>Pets (outros)</span></label>
+          <label class="opt-item checkbox"><input type="checkbox" name="q3_3"><span class="opt-face"><span class="opt-dot"></span>Funcionários que pernoitam</span></label>
+          <label class="opt-item checkbox"><input type="checkbox" name="q3_3"><span class="opt-face"><span class="opt-dot"></span>Funcionários diários</span></label>
+          <label class="opt-item checkbox"><input type="checkbox" name="q3_3"><span class="opt-face"><span class="opt-dot"></span>Crianças (0–5 anos)</span></label>
+          <label class="opt-item checkbox"><input type="checkbox" name="q3_3"><span class="opt-face"><span class="opt-dot"></span>Adolescentes</span></label>
+          <label class="opt-item checkbox"><input type="checkbox" name="q3_3"><span class="opt-face"><span class="opt-dot"></span>Idosos</span></label>
+          <label class="opt-item checkbox"><input type="checkbox" name="q3_3"><span class="opt-face"><span class="opt-dot"></span>PCD</span></label>
+        </div>
+      </div>
+
+      <div class="q-card">
+        <div class="q-label">Quais são os itens indispensáveis no imóvel?<span class="req">*</span></div>
+        <div class="opts-grid">
+          <label class="opt-item checkbox"><input type="checkbox" name="q3_4"><span class="opt-face"><span class="opt-dot"></span>3+ suítes</span></label>
+          <label class="opt-item checkbox"><input type="checkbox" name="q3_4"><span class="opt-face"><span class="opt-dot"></span>4+ suítes</span></label>
+          <label class="opt-item checkbox"><input type="checkbox" name="q3_4"><span class="opt-face"><span class="opt-dot"></span>5+ suítes</span></label>
+          <label class="opt-item checkbox"><input type="checkbox" name="q3_4"><span class="opt-face"><span class="opt-dot"></span>2+ vagas</span></label>
+          <label class="opt-item checkbox"><input type="checkbox" name="q3_4"><span class="opt-face"><span class="opt-dot"></span>3+ vagas</span></label>
+          <label class="opt-item checkbox"><input type="checkbox" name="q3_4"><span class="opt-face"><span class="opt-dot"></span>Varanda gourmet</span></label>
+          <label class="opt-item checkbox"><input type="checkbox" name="q3_4"><span class="opt-face"><span class="opt-dot"></span>Lazer completo</span></label>
+          <label class="opt-item checkbox"><input type="checkbox" name="q3_4"><span class="opt-face"><span class="opt-dot"></span>Home office</span></label>
+          <label class="opt-item checkbox"><input type="checkbox" name="q3_4"><span class="opt-face"><span class="opt-dot"></span>Cinema / sala de mídia</span></label>
+          <label class="opt-item checkbox"><input type="checkbox" name="q3_4"><span class="opt-face"><span class="opt-dot"></span>Adega</span></label>
+          <label class="opt-item checkbox"><input type="checkbox" name="q3_4"><span class="opt-face"><span class="opt-dot"></span>Piscina</span></label>
+          <label class="opt-item checkbox"><input type="checkbox" name="q3_4"><span class="opt-face"><span class="opt-dot"></span>Jardim</span></label>
+          <label class="opt-item checkbox"><input type="checkbox" name="q3_4"><span class="opt-face"><span class="opt-dot"></span>Churrasqueira</span></label>
+          <label class="opt-item checkbox"><input type="checkbox" name="q3_4"><span class="opt-face"><span class="opt-dot"></span>Sauna</span></label>
+          <label class="opt-item checkbox"><input type="checkbox" name="q3_4"><span class="opt-face"><span class="opt-dot"></span>Academia</span></label>
+        </div>
+      </div>
+
+      <div class="q-card">
+        <div class="q-label">Há alguma restrição ou exigência específica?</div>
+        <div class="opts-grid">
+          <label class="opt-item checkbox"><input type="checkbox" name="q3_5"><span class="opt-face"><span class="opt-dot"></span>Acessibilidade — idosos</span></label>
+          <label class="opt-item checkbox"><input type="checkbox" name="q3_5"><span class="opt-face"><span class="opt-dot"></span>Acessibilidade — PCD</span></label>
+          <label class="opt-item checkbox"><input type="checkbox" name="q3_5"><span class="opt-face"><span class="opt-dot"></span>Portaria 24h</span></label>
+          <label class="opt-item checkbox"><input type="checkbox" name="q3_5"><span class="opt-face"><span class="opt-dot"></span>Privacidade máxima</span></label>
+          <label class="opt-item checkbox"><input type="checkbox" name="q3_5"><span class="opt-face"><span class="opt-dot"></span>Vista específica</span></label>
+          <label class="opt-item checkbox"><input type="checkbox" name="q3_5"><span class="opt-face"><span class="opt-dot"></span>Andar alto (+10°)</span></label>
+          <label class="opt-item checkbox"><input type="checkbox" name="q3_5"><span class="opt-face"><span class="opt-dot"></span>Andar baixo (-5°)</span></label>
+          <label class="opt-item checkbox"><input type="checkbox" name="q3_5"><span class="opt-face"><span class="opt-dot"></span>Apenas casas</span></label>
+          <label class="opt-item checkbox"><input type="checkbox" name="q3_5"><span class="opt-face"><span class="opt-dot"></span>Apenas apartamentos</span></label>
+          <label class="opt-item checkbox"><input type="checkbox" name="q3_5"><span class="opt-face"><span class="opt-dot"></span>Condomínio fechado</span></label>
+        </div>
+      </div>
+
+      <div class="q-card">
+        <div class="q-label">Qual seu nível de tolerância a obras ou reformas?<span class="req">*</span></div>
+        <div class="opts-col">
+          <label class="opt-item"><input type="radio" name="q3_6"><span class="opt-face"><span class="opt-dot"></span>Apenas pronto para morar</span></label>
+          <label class="opt-item"><input type="radio" name="q3_6"><span class="opt-face"><span class="opt-dot"></span>Pequenas reformas</span></label>
+          <label class="opt-item"><input type="radio" name="q3_6"><span class="opt-face"><span class="opt-dot"></span>Reformas médias</span></label>
+          <label class="opt-item"><input type="radio" name="q3_6"><span class="opt-face"><span class="opt-dot"></span>Grandes reformas</span></label>
+          <label class="opt-item"><input type="radio" name="q3_6"><span class="opt-face"><span class="opt-dot"></span>Busco para reformar totalmente</span></label>
+        </div>
+      </div>
+
+      <div class="q-card">
+        <div class="q-label">Que estágio de empreendimento você considera?</div>
+        <div class="q-hint">Pode selecionar mais de uma opção — calibra a curadoria, não restringe o universo de busca.</div>
+        <div class="opts-col">
+          <label class="opt-item checkbox"><input type="checkbox" name="q3_estagio"><span class="opt-face"><span class="opt-dot"></span>Lançamento (na planta)</span></label>
+          <label class="opt-item checkbox"><input type="checkbox" name="q3_estagio"><span class="opt-face"><span class="opt-dot"></span>Em obras</span></label>
+          <label class="opt-item checkbox"><input type="checkbox" name="q3_estagio"><span class="opt-face"><span class="opt-dot"></span>Pronto para morar (novo)</span></label>
+          <label class="opt-item checkbox"><input type="checkbox" name="q3_estagio"><span class="opt-face"><span class="opt-dot"></span>Usado / revenda de alto padrão</span></label>
+          <label class="opt-item checkbox"><input type="checkbox" name="q3_estagio"><span class="opt-face"><span class="opt-dot"></span>Tanto faz — o que importa é o imóvel certo</span></label>
+        </div>
+      </div>
+
+      <div class="q-card">
+        <div class="q-label">Quais bairros ou regiões são de seu interesse em São Paulo?<span class="req">*</span></div>
+        <div class="opts-grid">
+          <label class="opt-item checkbox"><input type="checkbox" name="q3_7"><span class="opt-face"><span class="opt-dot"></span>Jardins</span></label>
+          <label class="opt-item checkbox"><input type="checkbox" name="q3_7"><span class="opt-face"><span class="opt-dot"></span>Vila Madalena / Pinheiros</span></label>
+          <label class="opt-item checkbox"><input type="checkbox" name="q3_7"><span class="opt-face"><span class="opt-dot"></span>Itaim Bibi / Vila Olímpia</span></label>
+          <label class="opt-item checkbox"><input type="checkbox" name="q3_7"><span class="opt-face"><span class="opt-dot"></span>Moema / Brooklin</span></label>
+          <label class="opt-item checkbox"><input type="checkbox" name="q3_7"><span class="opt-face"><span class="opt-dot"></span>Higienópolis</span></label>
+          <label class="opt-item checkbox"><input type="checkbox" name="q3_7"><span class="opt-face"><span class="opt-dot"></span>Perdizes / Pompeia</span></label>
+          <label class="opt-item checkbox"><input type="checkbox" name="q3_7"><span class="opt-face"><span class="opt-dot"></span>Campo Belo</span></label>
+          <label class="opt-item checkbox"><input type="checkbox" name="q3_7"><span class="opt-face"><span class="opt-dot"></span>Vila Nova Conceição</span></label>
+          <label class="opt-item checkbox"><input type="checkbox" name="q3_7"><span class="opt-face"><span class="opt-dot"></span>Morumbi</span></label>
+          <label class="opt-item checkbox"><input type="checkbox" name="q3_7"><span class="opt-face"><span class="opt-dot"></span>Alphaville</span></label>
+          <label class="opt-item checkbox"><input type="checkbox" name="q3_7"><span class="opt-face"><span class="opt-dot"></span>Granja Viana</span></label>
+          <label class="opt-item checkbox"><input type="checkbox" name="q3_7"><span class="opt-face"><span class="opt-dot"></span>Outros</span></label>
+        </div>
+      </div>
+
+      <div class="q-card">
+        <div class="q-label">Há bairros ou características que devem ser evitados?</div>
+        <textarea class="q-textarea" id="q3_8" placeholder="Descreva regiões ou características indesejadas…"></textarea>
+      </div>
+
+      <div class="a-nav">
+        <button class="nav-back" onclick="goTo(2)">← Voltar</button>
+        <div class="a-nav-info">Etapa 3 de 6</div>
+        <button class="nav-next" onclick="goTo(4)">Próximo <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+      </div>
+    </div>
+
+    <!-- ── SEÇÃO 4: EXPERIÊNCIA ── -->
+    <div class="a-section" id="s4">
+      <div class="a-sec-header">
+        <div>
+          <div class="a-sec-eyebrow">Pilar IV</div>
+          <div class="a-sec-title">Experiência</div>
+          <div class="a-sec-sub">Expectativas e histórico de compra</div>
+        </div>
+        <div class="a-sec-badge">6 questões</div>
+      </div>
+
+      <div class="q-card">
+        <div class="q-label">Qual é sua experiência anterior com compra de imóveis?<span class="req">*</span></div>
+        <div class="opts-col">
+          <label class="opt-item"><input type="radio" name="q4_1"><span class="opt-face"><span class="opt-dot"></span>Nunca comprei</span></label>
+          <label class="opt-item"><input type="radio" name="q4_1"><span class="opt-face"><span class="opt-dot"></span>1 vez</span></label>
+          <label class="opt-item"><input type="radio" name="q4_1"><span class="opt-face"><span class="opt-dot"></span>2–3 vezes</span></label>
+          <label class="opt-item"><input type="radio" name="q4_1"><span class="opt-face"><span class="opt-dot"></span>4+ vezes (experiente)</span></label>
+          <label class="opt-item"><input type="radio" name="q4_1"><span class="opt-face"><span class="opt-dot"></span>Prefiro não informar</span></label>
+        </div>
+      </div>
+
+      <div class="q-card">
+        <div class="q-label">Em processos anteriores, o que foi mais desafiador?</div>
+        <div class="opts-grid">
+          <label class="opt-item checkbox"><input type="checkbox" name="q4_2"><span class="opt-face"><span class="opt-dot"></span>Encontrar opções alinhadas</span></label>
+          <label class="opt-item checkbox"><input type="checkbox" name="q4_2"><span class="opt-face"><span class="opt-dot"></span>Falta de transparência</span></label>
+          <label class="opt-item checkbox"><input type="checkbox" name="q4_2"><span class="opt-face"><span class="opt-dot"></span>Negociação</span></label>
+          <label class="opt-item checkbox"><input type="checkbox" name="q4_2"><span class="opt-face"><span class="opt-dot"></span>Tempo e logística</span></label>
+          <label class="opt-item checkbox"><input type="checkbox" name="q4_2"><span class="opt-face"><span class="opt-dot"></span>Documentação e burocracia</span></label>
+          <label class="opt-item checkbox"><input type="checkbox" name="q4_2"><span class="opt-face"><span class="opt-dot"></span>Confiabilidade do corretor</span></label>
+        </div>
+      </div>
+
+      <div class="q-card">
+        <div class="q-label">Como você prefere tomar decisões?<span class="req">*</span></div>
+        <div class="opts-col">
+          <label class="opt-item"><input type="radio" name="q4_3"><span class="opt-face"><span class="opt-dot"></span>Rápida, com poucas opções filtradas</span></label>
+          <label class="opt-item"><input type="radio" name="q4_3"><span class="opt-face"><span class="opt-dot"></span>Comparo algumas opções escolhidas</span></label>
+          <label class="opt-item"><input type="radio" name="q4_3"><span class="opt-face"><span class="opt-dot"></span>Análise detalhada com dados e comparativos</span></label>
+          <label class="opt-item"><input type="radio" name="q4_3"><span class="opt-face"><span class="opt-dot"></span>Depende do contexto e do valor envolvido</span></label>
+        </div>
+      </div>
+
+      <div class="q-card">
+        <div class="q-label">Como seria a experiência de compra ideal para você?</div>
+        <textarea class="q-textarea" id="q4_4" placeholder="Descreva o que tornaria esta jornada diferenciada…"></textarea>
+      </div>
+
+      <div class="q-card">
+        <div class="q-label">Como prefere descobrir e avaliar opções?<span class="req">*</span></div>
+        <div class="opts-grid">
+          <label class="opt-item checkbox"><input type="checkbox" name="q4_5"><span class="opt-face"><span class="opt-dot"></span>Curadoria via consultor</span></label>
+          <label class="opt-item checkbox"><input type="checkbox" name="q4_5"><span class="opt-face"><span class="opt-dot"></span>Anúncios online</span></label>
+          <label class="opt-item checkbox"><input type="checkbox" name="q4_5"><span class="opt-face"><span class="opt-dot"></span>Indicações de confiança</span></label>
+          <label class="opt-item checkbox"><input type="checkbox" name="q4_5"><span class="opt-face"><span class="opt-dot"></span>Visitas guiadas presenciais</span></label>
+          <label class="opt-item checkbox"><input type="checkbox" name="q4_5"><span class="opt-face"><span class="opt-dot"></span>Relatórios comparativos</span></label>
+          <label class="opt-item checkbox"><input type="checkbox" name="q4_5"><span class="opt-face"><span class="opt-dot"></span>Tours virtuais</span></label>
+        </div>
+      </div>
+
+      <div class="q-card">
+        <div class="q-label">Qual seu nível de disponibilidade para visitas nas próximas semanas?<span class="req">*</span></div>
+        <div class="slider-wrap">
+          <div class="slider-track">
+            <input type="range" class="slider-input" id="sl_q4_6" min="1" max="10" value="5" data-sc="q4_6">
+          </div>
+          <div class="slider-value-row">
+            <span class="scale-labels" style="flex:1; margin-top:0;"><span>Pouco disponível</span><span>Muito disponível</span></span>
+          </div>
+          <div style="text-align:center; margin-top:8px;">
+            <span class="slider-value" id="sv_q4_6">5</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="a-nav">
+        <button class="nav-back" onclick="goTo(3)">← Voltar</button>
+        <div class="a-nav-info">Etapa 4 de 6</div>
+        <button class="nav-next" onclick="goTo(5)">Próximo <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+      </div>
+    </div>
+
+    <!-- ── SEÇÃO 5: LEGADO ── -->
+    <div class="a-section" id="s5">
+      <div class="a-sec-header">
+        <div>
+          <div class="a-sec-eyebrow">Pilar V</div>
+          <div class="a-sec-title">Visão de Futuro</div>
+          <div class="a-sec-sub">Planos de longo prazo e legado</div>
+        </div>
+        <div class="a-sec-badge">6 questões</div>
+      </div>
+
+      <div class="q-card">
+        <div class="q-label">Por quanto tempo você pretende manter este imóvel?<span class="req">*</span></div>
+        <div class="opts-col">
+          <label class="opt-item"><input type="radio" name="q5_1"><span class="opt-face"><span class="opt-dot"></span>Até 3 anos</span></label>
+          <label class="opt-item"><input type="radio" name="q5_1"><span class="opt-face"><span class="opt-dot"></span>3–5 anos</span></label>
+          <label class="opt-item"><input type="radio" name="q5_1"><span class="opt-face"><span class="opt-dot"></span>5–10 anos</span></label>
+          <label class="opt-item"><input type="radio" name="q5_1"><span class="opt-face"><span class="opt-dot"></span>Mais de 10 anos</span></label>
+          <label class="opt-item"><input type="radio" name="q5_1"><span class="opt-face"><span class="opt-dot"></span>Indefinido — depende das circunstâncias</span></label>
+        </div>
+      </div>
+
+      <div class="q-card">
+        <div class="q-label">Este imóvel está conectado a planos de legado familiar?</div>
+        <div class="opts-col">
+          <label class="opt-item"><input type="radio" name="q5_2"><span class="opt-face"><span class="opt-dot"></span>Sim, para a família</span></label>
+          <label class="opt-item"><input type="radio" name="q5_2"><span class="opt-face"><span class="opt-dot"></span>Possivelmente</span></label>
+          <label class="opt-item"><input type="radio" name="q5_2"><span class="opt-face"><span class="opt-dot"></span>Não — uso pessoal ou investimento</span></label>
+          <label class="opt-item"><input type="radio" name="q5_2"><span class="opt-face"><span class="opt-dot"></span>Ainda avaliando</span></label>
+        </div>
+      </div>
+
+      <div class="q-card">
+        <div class="q-label">Quais valores você deseja que o imóvel reflita no longo prazo?</div>
+        <div class="opts-grid">
+          <label class="opt-item checkbox"><input type="checkbox" name="q5_3"><span class="opt-face"><span class="opt-dot"></span>Sustentabilidade</span></label>
+          <label class="opt-item checkbox"><input type="checkbox" name="q5_3"><span class="opt-face"><span class="opt-dot"></span>Arquitetura atemporal</span></label>
+          <label class="opt-item checkbox"><input type="checkbox" name="q5_3"><span class="opt-face"><span class="opt-dot"></span>Localização estratégica</span></label>
+          <label class="opt-item checkbox"><input type="checkbox" name="q5_3"><span class="opt-face"><span class="opt-dot"></span>Baixa manutenção</span></label>
+          <label class="opt-item checkbox"><input type="checkbox" name="q5_3"><span class="opt-face"><span class="opt-dot"></span>Flexibilidade de uso</span></label>
+          <label class="opt-item checkbox"><input type="checkbox" name="q5_3"><span class="opt-face"><span class="opt-dot"></span>Privacidade e segurança</span></label>
+        </div>
+      </div>
+
+      <div class="q-card">
+        <div class="q-label">Quais características "future-proof" são importantes?<span class="req">*</span></div>
+        <div class="opts-grid">
+          <label class="opt-item checkbox"><input type="checkbox" name="q5_4"><span class="opt-face"><span class="opt-dot"></span>Acessibilidade e mobilidade</span></label>
+          <label class="opt-item checkbox"><input type="checkbox" name="q5_4"><span class="opt-face"><span class="opt-dot"></span>Ambientes flexíveis</span></label>
+          <label class="opt-item checkbox"><input type="checkbox" name="q5_4"><span class="opt-face"><span class="opt-dot"></span>Smart Home</span></label>
+          <label class="opt-item checkbox"><input type="checkbox" name="q5_4"><span class="opt-face"><span class="opt-dot"></span>Infraestrutura trabalho remoto</span></label>
+          <label class="opt-item checkbox"><input type="checkbox" name="q5_4"><span class="opt-face"><span class="opt-dot"></span>Eficiência energética</span></label>
+        </div>
+      </div>
+
+      <div class="q-card">
+        <div class="q-label">Quão importante é o tema "legado" na sua decisão?</div>
+        <div class="slider-wrap">
+          <div class="slider-track">
+            <input type="range" class="slider-input" id="sl_q5_5" min="1" max="10" value="5" data-sc="q5_5">
+          </div>
+          <div class="slider-value-row">
+            <span class="scale-labels" style="flex:1; margin-top:0;"><span>Pouco relevante</span><span>Muito relevante</span></span>
+          </div>
+          <div style="text-align:center; margin-top:8px;">
+            <span class="slider-value" id="sv_q5_5">5</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="q-card">
+        <div class="q-label">Descreva sua visão de futuro e como este imóvel se encaixa nela</div>
+        <textarea class="q-textarea" id="q5_6" placeholder="Compartilhe sua visão com liberdade — quanto mais você compartilhar, mais precisa será a curadoria…" style="min-height:110px;"></textarea>
+      </div>
+
+      <div class="a-nav">
+        <button class="nav-back" onclick="goTo(4)">← Voltar</button>
+        <div class="a-nav-info">Etapa 5 de 6</div>
+        <button class="nav-next" onclick="goTo(6)">Próximo <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+      </div>
+    </div>
+
+    <!-- ── SEÇÃO 6: CONTATO ── -->
+    <div class="a-section" id="s6">
+      <div class="a-sec-header">
+        <div>
+          <div class="a-sec-eyebrow">Finalização</div>
+          <div class="a-sec-title">Seus Dados</div>
+          <div class="a-sec-sub">Informações para agendamento da sua consultoria</div>
+        </div>
+        <div class="a-sec-badge">Quase lá!</div>
+      </div>
+
+      <div class="q-card">
+        <div class="field-group">
+          <label class="field-lbl" for="c_name">Nome completo<span class="req">*</span></label>
+          <input class="q-input" type="text" id="c_name" placeholder="Seu nome completo">
+        </div>
+        <div class="fields-2">
+          <div class="field-group">
+            <label class="field-lbl" for="c_email">E-mail<span class="req">*</span></label>
+            <input class="q-input" type="email" id="c_email" placeholder="seu@email.com">
+          </div>
+          <div class="field-group">
+            <label class="field-lbl" for="c_phone">WhatsApp / Telefone<span class="req">*</span></label>
+            <input class="q-input" type="tel" id="c_phone" placeholder="(11) 9 0000-0000">
+          </div>
+        </div>
+      </div>
+
+      <div class="q-card">
+        <div class="q-label">Forma de contato preferencial<span class="req">*</span></div>
+        <div class="opts-col">
+          <label class="opt-item"><input type="radio" name="c_pref"><span class="opt-face"><span class="opt-dot"></span>WhatsApp</span></label>
+          <label class="opt-item"><input type="radio" name="c_pref"><span class="opt-face"><span class="opt-dot"></span>Ligação telefônica</span></label>
+          <label class="opt-item"><input type="radio" name="c_pref"><span class="opt-face"><span class="opt-dot"></span>E-mail</span></label>
+          <label class="opt-item"><input type="radio" name="c_pref"><span class="opt-face"><span class="opt-dot"></span>Videochamada</span></label>
+        </div>
+      </div>
+
+      <div class="q-card">
+        <div class="q-label">Disponibilidade para a consultoria (15 min)</div>
+        <div class="opts-grid">
+          <label class="opt-item checkbox"><input type="checkbox" name="c_avail"><span class="opt-face"><span class="opt-dot"></span>Manhã (8h–12h)</span></label>
+          <label class="opt-item checkbox"><input type="checkbox" name="c_avail"><span class="opt-face"><span class="opt-dot"></span>Tarde (12h–18h)</span></label>
+          <label class="opt-item checkbox"><input type="checkbox" name="c_avail"><span class="opt-face"><span class="opt-dot"></span>Noite (18h–21h)</span></label>
+          <label class="opt-item checkbox"><input type="checkbox" name="c_avail"><span class="opt-face"><span class="opt-dot"></span>Qualquer horário comercial</span></label>
+        </div>
+      </div>
+
+      <div class="q-card">
+        <div class="q-label">Urgência da sua busca<span class="req">*</span></div>
+        <div class="opts-col">
+          <label class="opt-item"><input type="radio" name="c_urg"><span class="opt-face"><span class="opt-dot"></span>Muito urgente — semanas</span></label>
+          <label class="opt-item"><input type="radio" name="c_urg"><span class="opt-face"><span class="opt-dot"></span>Urgente — 1 a 2 meses</span></label>
+          <label class="opt-item"><input type="radio" name="c_urg"><span class="opt-face"><span class="opt-dot"></span>Moderada — 3 a 6 meses</span></label>
+          <label class="opt-item"><input type="radio" name="c_urg"><span class="opt-face"><span class="opt-dot"></span>Sem pressa — 6 a 12 meses</span></label>
+          <label class="opt-item"><input type="radio" name="c_urg"><span class="opt-face"><span class="opt-dot"></span>Apenas explorando possibilidades</span></label>
+        </div>
+      </div>
+
+      <div class="q-card">
+        <label class="field-lbl" for="c_obs">Comentários adicionais (opcional)</label>
+        <textarea class="q-textarea" id="c_obs" placeholder="Qualquer informação que queira compartilhar…"></textarea>
+      </div>
+
+      <div id="submitErr" class="err-msg">Ocorreu um erro ao enviar. Verifique sua conexão e tente novamente.</div>
+
+      <div class="a-nav">
+        <button class="nav-back" onclick="goTo(5)">← Voltar</button>
+        <div class="a-nav-info">Etapa 6 de 6</div>
+        <button class="nav-next" id="submitBtn" onclick="submitForm()" style="background:#16A34A;">
+          Concluir Anamnese
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+        </button>
+      </div>
+    </div>
+
+  </div><!-- /a-body -->
+
+  <!-- SUCCESS -->
+  <div class="success-page" id="successPage" style="display:none;">
+    <div class="success-icon-wrap">
+      <svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+    </div>
+    <h2 class="success-title">Anamnese <em>concluída!</em></h2>
+    <p class="success-sub">Obrigado, <strong id="successName" style="font-weight:500;"></strong>. Seu diagnóstico foi recebido com sucesso.</p>
+
+    <!-- RESUMO 5 PILARES -->
+    <div class="success-card" style="max-width:560px; margin-bottom:16px;">
+      <div class="success-card-tag">Retrato inicial que você me entregou</div>
+      <div id="summaryContent" style="display:flex; flex-direction:column; gap:10px; margin-top:4px;"></div>
+    </div>
+
+    <!-- PRÓXIMO PASSO -->
+    <div class="success-card" style="max-width:560px;">
+      <div class="success-card-tag">Mapa de Preferências</div>
+      <div class="success-card-sub" style="margin-bottom:20px;">A excelência de uma curadoria personalizada está nos detalhes. Esta breve etapa nos permitirá compreender com maior profundidade suas prioridades, calibrando nossa seleção de acordo com seu perfil e momento de vida.<br><br>Leva apenas 1 minuto e contribuirá para uma apresentação de imóveis mais assertiva durante nossa Call.</div>
+      <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+        <a class="btn-schedule" href="pesos.html" style="background:var(--teal);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          Iniciar Mapa de Preferências
+        </a>
+        <a class="btn-schedule" href="https://calendar.app.google/dffTZGue9T52RuEe9" target="_blank" style="background:transparent; border:1px solid var(--teal); color:var(--teal);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Agendar consultoria
+        </a>
+        <button onclick="exportPerfil()" style="margin-top:10px;display:inline-flex;align-items:center;gap:8px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;padding:12px 24px;border-radius:8px;cursor:pointer;border:1px solid var(--border);background:white;color:var(--dark);width:100%;justify-content:center;transition:all 0.2s;" onmouseover="this.style.background='#F8FAFC'" onmouseout="this.style.background='white'">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Baixar perfil (JSON para o Motor de Compatibilidade)
+        </button>
+      </div>
+    </div>
+    <p class="success-note" style="margin-top:16px;">Agenda disponível a partir de 2 dias úteis após esta data.</p>
+  </div>
+
+</div><!-- /app -->
+
+<script>
+emailjs.init("D8d3opazl1_fH0PVL");
+
+let cur = 1;
+const scaleVals = {};
+const times = ['~15 min restantes','~13 min restantes','~10 min restantes','~7 min restantes','~4 min restantes','~2 min restantes'];
+
+function showApp() {
+  document.getElementById('landing').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  window.scrollTo(0, 0);
+}
+
+function goBack() {
+  if (cur === 1) {
+    document.getElementById('app').style.display = 'none';
+    document.getElementById('landing').style.display = 'block';
+    window.scrollTo(0, 0);
+  } else {
+    goTo(cur - 1);
+  }
+}
+
+function goTo(n) {
+  document.getElementById('s' + cur).classList.remove('active');
+  // mark done
+  const prevInd = document.getElementById('step-ind-' + cur);
+  if (prevInd) { prevInd.classList.remove('active'); if (n > cur) prevInd.classList.add('done'); }
+  cur = n;
+  const sec = document.getElementById('s' + cur);
+  if (sec) {
+    sec.classList.add('active');
+    window.scrollTo(0, 0);
+  }
+  const ind = document.getElementById('step-ind-' + cur);
+  if (ind) { ind.classList.add('active'); ind.classList.remove('done'); }
+  const pct = ((cur - 1) / 6 * 100).toFixed(0);
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('timeEst').textContent = times[cur - 1] || '';
+}
+
+// Sliders
+document.querySelectorAll('.slider-input').forEach(sl => {
+  const sc = sl.dataset.sc;
+  const disp = document.getElementById('sv_' + sc);
+  scaleVals[sc] = sl.value;
+  function update() {
+    const v = sl.value;
+    scaleVals[sc] = v;
+    if (disp) { disp.textContent = v; disp.style.transform = 'scale(1.2)'; setTimeout(() => disp.style.transform = 'scale(1)', 150); }
+    const pct = ((v - 1) / 9) * 100;
+    sl.style.background = `linear-gradient(to right, var(--teal) 0%, var(--teal) ${pct}%, var(--border) ${pct}%, var(--border) 100%)`;
+  }
+  update();
+  sl.addEventListener('input', update);
+});
+
+function getRadio(name) {
+  const el = document.querySelector('input[name="' + name + '"]:checked');
+  return el ? el.parentElement.querySelector('.opt-face').textContent.trim() : '—';
+}
+function getChecks(name) {
+  const els = [...document.querySelectorAll('input[name="' + name + '"]:checked')];
+  return els.length ? els.map(e => e.parentElement.querySelector('.opt-face').textContent.trim()).join(', ') : '—';
+}
+function getVal(id) { const el = document.getElementById(id); return el && el.value.trim() ? el.value.trim() : '—'; }
+function getScale(k) { return scaleVals[k] || '—'; }
+
+function buildSummary() {
+  const items = [
+    { icon: '🎯', label: 'Sua motivação central', val: getRadio('q1_1') },
+    { icon: '🏛️', label: 'Horizonte patrimonial', val: [getRadio('q2_1'), getRadio('q2_2')].filter(v=>v!=='—').join(' · ') || '—' },
+    { icon: '🏠', label: 'O imóvel precisa ter', val: getChecks('q3_4') },
+    { icon: '✨', label: 'Como você decide', val: getRadio('q4_3') },
+    { icon: '🕊️', label: 'Horizonte de permanência', val: getRadio('q5_1') }
+  ];
+  const el = document.getElementById('summaryContent');
+  if (!el) return;
+  el.innerHTML = items.map(i => `
+    <div style="display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--border);">
+      <span style="font-size:16px;flex-shrink:0;">${i.icon}</span>
+      <div>
+        <div style="font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.08em;color:var(--teal);margin-bottom:2px;">${i.label}</div>
+        <div style="font-size:14px;font-weight:300;color:var(--dark);line-height:1.4;">${i.val !== '—' ? i.val : '<em style="color:var(--text-soft)">não respondido</em>'}</div>
+      </div>
+    </div>`).join('');
+}
+
+function buildEmail() {
+  const name = getVal('c_name'), email = getVal('c_email'), phone = getVal('c_phone');
+  return `ANAMNESE IMOBILIÁRIA — SP IMÓVEIS
+Data: ${new Date().toLocaleString('pt-BR')}
+
+━━━ CLIENTE ━━━
+Nome: ${name}
+E-mail: ${email}
+Telefone: ${phone}
+Contato preferencial: ${getRadio('c_pref')}
+Disponibilidade: ${getChecks('c_avail')}
+Urgência: ${getRadio('c_urg')}
+
+━━━ PILAR I — MOTIVAÇÃO ━━━
+Motivação principal: ${getRadio('q1_1')}
+Sentimento atual: ${getRadio('q1_2')}
+Sensações esperadas: ${getChecks('q1_3')}
+Mudança pessoal: ${getRadio('q1_4')}
+Valores desejados: ${getChecks('q1_5')}
+Planos de vida: ${getVal('q1_6')}
+Importância (1-10): ${getScale('q1_7')}
+
+━━━ PILAR II — PATRIMONIAL ━━━
+Finalidade: ${getRadio('q2_1')}
+Valor a investir: ${getRadio('q2_2')}
+Margem de negociação: ${getRadio('q2_3')}
+Outros imóveis: ${getRadio('q2_4')}
+Tipo preferido: ${getRadio('q2_5')}
+Objetivos: ${getChecks('q2_6')}
+Retorno esperado: ${getRadio('q2_7')}
+Financiamento: ${getRadio('q2_8')}
+Tolerância a risco: ${getRadio('q2_9')}
+
+━━━ PILAR III — FUNCIONAL ━━━
+Rotina diária: ${getVal('q3_1')}
+Moradores: ${getRadio('q3_2')}
+Pets/funcionários: ${getChecks('q3_3')}
+Estágio de empreendimento: ${getChecks('q3_estagio')}
+Itens indispensáveis: ${getChecks('q3_4')}
+Restrições: ${getChecks('q3_5')}
+Tolerância a reformas: ${getRadio('q3_6')}
+Bairros de interesse: ${getChecks('q3_7')}
+A evitar: ${getVal('q3_8')}
+
+━━━ PILAR IV — EXPERIÊNCIA ━━━
+Experiência anterior: ${getRadio('q4_1')}
+Desafios anteriores: ${getChecks('q4_2')}
+Estilo de decisão: ${getRadio('q4_3')}
+Experiência ideal: ${getVal('q4_4')}
+Como avalia opções: ${getChecks('q4_5')}
+Disponibilidade (1-10): ${getScale('q4_6')}
+
+━━━ PILAR V — LEGADO ━━━
+Tempo de permanência: ${getRadio('q5_1')}
+Legado familiar: ${getRadio('q5_2')}
+Valores longo prazo: ${getChecks('q5_3')}
+Future-proof: ${getChecks('q5_4')}
+Importância legado (1-10): ${getScale('q5_5')}
+Visão de futuro: ${getVal('q5_6')}
+
+━━━ COMENTÁRIOS ━━━
+${getVal('c_obs')}`;
+}
+
+async function submitForm() {
+  const name = getVal('c_name'), email = getVal('c_email'), phone = getVal('c_phone');
+  const errEl = document.getElementById('submitErr');
+  errEl.classList.remove('show');
+  if (!name || !email || !phone) {
+    errEl.textContent = 'Por favor, preencha nome, e-mail e telefone.';
+    errEl.classList.add('show'); return;
+  }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    errEl.textContent = 'Por favor, insira um e-mail válido.';
+    errEl.classList.add('show'); return;
+  }
+  document.getElementById('overlay').classList.add('show');
+  document.getElementById('submitBtn').disabled = true;
+
+  // ── PASSO 1: salva perfil + download ANTES do e-mail ──
+  const perfilAnamnese = buildClientProfile();
+  localStorage.setItem('pf_perfil_cliente', JSON.stringify(perfilAnamnese));
+  localStorage.setItem('pf_perfil_etapa', 'anamnese');
+  // Download automático como backup
+  try {
+    const nomeSafe = perfilAnamnese.nome.replace(/[^a-zA-Z0-9]/g, '_');
+    const dataHoje = new Date().toISOString().slice(0, 10);
+    const blob = new Blob([JSON.stringify(perfilAnamnese, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'anamnese_' + nomeSafe + '_' + dataHoje + '.json';
+    document.body.appendChild(a); a.click();
+    document.body.removeChild(a); URL.revokeObjectURL(a.href);
+  } catch(e) { console.warn('Auto-download falhou:', e); }
+
+  // ── PASSO 2: mostra tela de sucesso ──
+  document.getElementById('overlay').classList.remove('show');
+  document.getElementById('s6').classList.remove('active');
+  document.querySelector('.a-steps').style.display = 'none';
+  document.querySelector('.a-progress-bar').style.display = 'none';
+  document.getElementById('successName').textContent = name;
+  buildSummary();
+  const sp = document.getElementById('successPage');
+  sp.style.removeProperty('display');
+  sp.classList.add('show');
+  window.scrollTo(0, 0);
+
+  // ── PASSO 3: envia e-mail em background (silencioso se falhar) ──
+  const body = buildEmail();
+  try {
+    await emailjs.send('service_alesa01', 'template_nro7ud3', {
+      to_email: 'paulofranca.spimoveis@gmail.com', to_name: 'Paulo França',
+      from_name: name, client_email: email, client_phone: phone,
+      subject: 'Nova Anamnese — ' + name, message: body
+    });
+    await emailjs.send('service_alesa01', 'template_p504cqh', {
+      to_email: email, to_name: name, from_name: 'Paulo França',
+      subject: 'Sua Anamnese Imobiliária foi recebida',
+      message: 'Olá, ' + name + '!\n\nSua Anamnese Imobiliária foi concluída com sucesso.\n\nPaulo analisará seu diagnóstico e entrará em contato em breve.\n\nAtenciosamente,\nPaulo França'
+    });
+  } catch(e) {
+    console.warn('E-mail não enviado:', e);
+  }
+}
+// ══ EXPORTAR PERFIL DO CLIENTE (JSON) ══
+function buildClientProfile() {
+  return {
+    _versao: 'anamnese_v3_7_2',
+    _exportadoEm: new Date().toISOString(),
+    nome:     getVal('c_name'),
+    email:    getVal('c_email'),
+    telefone: getVal('c_phone'),
+    p1_motivacao:      getRadio('q1_1'),
+    p1_sentimento:     getRadio('q1_2'),
+    p1_sensacoes:      getChecks('q1_3'),
+    p1_mudanca:        getRadio('q1_4'),
+    p1_valores:        getChecks('q1_5'),
+    p1_planos:         getVal('q1_6'),
+    p1_importancia:    getScale('q1_7'),
+    p2_finalidade:     getRadio('q2_1'),
+    p2_faixa:          getRadio('q2_2'),
+    p2_margem:         getRadio('q2_3'),
+    p2_outros_imoveis: getRadio('q2_4'),
+    p2_tipo:           getRadio('q2_5'),
+    p2_objetivos:      getChecks('q2_6'),
+    p2_retorno:        getRadio('q2_7'),
+    p2_financiamento:  getRadio('q2_8'),
+    p2_risco:          getRadio('q2_9'),
+    p3_rotina:         getVal('q3_1'),
+    p3_moradores:      getRadio('q3_2'),
+    p3_conviventes:    getChecks('q3_3'),
+    p3_estagio:        getChecks('q3_estagio'),
+    p3_itens:          getChecks('q3_4'),
+    p3_restricoes:     getChecks('q3_5'),
+    p3_reforma:        getRadio('q3_6'),
+    p3_bairros:        getChecks('q3_7'),
+    p3_evitar:         getVal('q3_8'),
+    p4_experiencia:    getRadio('q4_1'),
+    p4_desafios:       getChecks('q4_2'),
+    p4_decisao:        getRadio('q4_3'),
+    p4_ideal:          getVal('q4_4'),
+    p4_avaliacao:      getChecks('q4_5'),
+    p4_disponib:       getScale('q4_6'),
+    p5_horizonte:      getRadio('q5_1'),
+    p5_legado:         getRadio('q5_2'),
+    p5_valores_lp:     getChecks('q5_3'),
+    p5_futureproof:    getChecks('q5_4'),
+    p5_importancia:    getScale('q5_5'),
+    p5_visao:          getVal('q5_6'),
+    pesos: {}  // preenchido pelo pesos_v2.html
+  };
+}
+
+function exportPerfil() {
+  const profile = buildClientProfile();
+  const nomeSafe = profile.nome.replace(/[^a-zA-Z0-9]/g, '_');
+  const data = new Date().toISOString().slice(0, 10);
+  const blob = new Blob([JSON.stringify(profile, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'perfil_' + nomeSafe + '_' + data + '.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(a.href);
+}
+
+</script>
+</body>
+</html>

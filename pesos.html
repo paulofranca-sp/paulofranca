@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Questionário de Calibração — Paulo França</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500&family=Bebas+Neue&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+<style>
+:root {
+  --teal: #0891B2; --teal-dark: #0E7490; --teal-light: #E0F7FA; --teal-mid: #BAE6FD;
+  --gold: #C4933F; --gold-light: #FEF3C7;
+  --dark: #0C1B2E; --text: #1E293B; --text-mid: #475569; --text-soft: #94A3B8;
+  --bg: #F8FAFC; --white: #FFFFFF; --border: #E2E8F0; --border-mid: #CBD5E1;
+  --card-shadow: 0 1px 4px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
+  --radius: 12px; --radius-sm: 8px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
+
+/* ── INTRO SCREEN ── */
+#intro {
+  min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  background: linear-gradient(160deg, #071624 0%, #0C2340 30%, #0F2D50 55%, #1A3A55 75%, #5C3D18 90%, #B07020 100%);
+  padding: 48px 24px; text-align: center;
+}
+.intro-logo { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 0.15em; color: white; margin-bottom: 40px; opacity: 0.9; }
+.intro-eyebrow { font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); font-weight: 400; margin-bottom: 14px; }
+.intro-title { font-family: 'Playfair Display', serif; font-size: clamp(36px, 6vw, 64px); font-weight: 700; color: white; line-height: 1.05; margin-bottom: 20px; }
+.intro-title em { font-style: italic; color: var(--gold); display: block; }
+.intro-sub { font-size: 16px; font-weight: 300; color: rgba(255,255,255,0.65); line-height: 1.75; max-width: 480px; margin: 0 auto 36px; }
+.btn-start-pesos {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--teal); color: white; border: none;
+  font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 500;
+  padding: 14px 32px; border-radius: 50px; cursor: pointer; transition: all 0.25s;
+}
+.btn-start-pesos:hover { background: var(--teal-dark); transform: translateY(-1px); }
+.intro-trust { display: flex; gap: 24px; margin-top: 32px; flex-wrap: wrap; justify-content: center; }
+.intro-trust-item { font-size: 12px; font-weight: 300; color: rgba(255,255,255,0.5); display: flex; align-items: center; gap: 6px; }
+
+/* ── APP ── */
+#app { display: none; }
+
+/* ── HEADER ── */
+.a-header {
+  position: sticky; top: 0; z-index: 100;
+  background: white; border-bottom: 1px solid var(--border);
+  padding: 0 32px; height: 56px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.a-logo { font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 0.1em; color: var(--dark); }
+.a-header-right { font-size: 12px; color: var(--text-soft); display: flex; align-items: center; gap: 5px; }
+.a-header-right svg { width: 14px; height: 14px; stroke: currentColor; fill: none; }
+
+/* ── PROGRESS ── */
+.a-progress-bar { height: 3px; background: var(--border); }
+.a-progress-fill { height: 100%; background: var(--teal); transition: width 0.4s ease; }
+
+/* ── STEP INDICATORS ── */
+.a-steps { background: white; border-bottom: 1px solid var(--border); padding: 12px 32px; overflow-x: auto; }
+.a-steps-inner { display: flex; gap: 4px; max-width: 860px; margin: 0 auto; }
+.a-step { display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1; min-width: 64px; opacity: 0.4; transition: opacity 0.2s; }
+.a-step.active { opacity: 1; }
+.a-step.done { opacity: 0.65; }
+.a-step-dot { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--border); background: var(--bg); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 400; color: var(--text-soft); transition: all 0.2s; }
+.a-step.active .a-step-dot { background: var(--teal-light); border-color: var(--teal); color: var(--teal); font-weight: 500; }
+.a-step.done .a-step-dot { background: #DCFCE7; border-color: #86EFAC; color: #16A34A; }
+.a-step-label { font-size: 10px; color: var(--text-soft); text-align: center; line-height: 1.2; white-space: nowrap; }
+.a-step.active .a-step-label { color: var(--teal); font-weight: 500; }
+
+/* ── BODY ── */
+.a-body { max-width: 720px; margin: 0 auto; padding: 32px 24px 120px; }
+.a-section { display: none; animation: fadeUp 0.35s ease; }
+.a-section.active { display: block; }
+@keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+
+/* ── ANTES DE COMEÇAR ── */
+.antes-card {
+  background: white; border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 36px 40px; margin-bottom: 20px;
+}
+.antes-eyebrow { font-size: 11px; font-weight: 500; letter-spacing: 0.15em; text-transform: uppercase; color: var(--teal); margin-bottom: 12px; }
+.antes-title { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: var(--dark); margin-bottom: 20px; line-height: 1.15; }
+.antes-list { list-style: none; display: flex; flex-direction: column; gap: 16px; margin-bottom: 28px; }
+.antes-item { display: flex; gap: 14px; align-items: flex-start; }
+.antes-icon { width: 32px; height: 32px; background: var(--teal-light); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.antes-icon svg { width: 15px; height: 15px; stroke: var(--teal); fill: none; stroke-width: 2; }
+.antes-item-text strong { display: block; font-size: 14px; font-weight: 500; color: var(--dark); margin-bottom: 2px; }
+.antes-item-text span { font-size: 13px; font-weight: 300; color: var(--text-mid); line-height: 1.6; }
+.antes-sign { font-size: 14px; font-style: italic; color: var(--text-soft); border-top: 1px solid var(--border); padding-top: 16px; margin-top: 4px; }
+.antes-sign strong { font-style: normal; color: var(--text-mid); font-weight: 400; }
+
+/* ── IDENTIFICAÇÃO ── */
+.id-card { background: white; border: 1px solid var(--border); border-radius: var(--radius); padding: 28px; margin-bottom: 12px; }
+.id-intro { font-size: 14px; font-weight: 300; color: var(--text-mid); line-height: 1.7; margin-bottom: 20px; padding: 14px 16px; background: var(--teal-light); border-radius: var(--radius-sm); border-left: 3px solid var(--teal); }
+.fields-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.field-group { margin-bottom: 0; }
+.field-lbl { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-mid); margin-bottom: 6px; display: block; }
+.q-input { width: 100%; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px 16px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 300; color: var(--text); background: var(--bg); outline: none; transition: border-color 0.15s; }
+.q-input::placeholder { color: var(--text-soft); }
+.q-input:focus { border-color: var(--teal); background: white; }
+.email-link-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; color: var(--teal); font-weight: 400; margin-top: 5px; }
+.email-link-badge svg { width: 12px; height: 12px; stroke: currentColor; fill: none; }
+
+/* ── SECTION HEADER ── */
+.a-sec-header { background: white; border: 1px solid var(--border); border-radius: var(--radius); padding: 24px 28px; margin-bottom: 16px; display: flex; align-items: flex-start; justify-content: space-between; }
+.a-sec-eyebrow { font-size: 11px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--teal); margin-bottom: 4px; }
+.a-sec-title { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 700; color: var(--dark); line-height: 1.1; }
+.a-sec-intro { font-size: 13px; font-weight: 300; color: var(--text-mid); margin-top: 8px; line-height: 1.65; max-width: 480px; font-style: italic; }
+.a-sec-badge { background: var(--teal-light); color: var(--teal-dark); font-size: 12px; font-weight: 500; padding: 4px 12px; border-radius: 50px; white-space: nowrap; margin-left: 16px; flex-shrink: 0; }
+
+/* ── CRITERION CARD ── */
+.crit-card { background: white; border: 1px solid var(--border); border-radius: var(--radius); padding: 22px 28px; margin-bottom: 10px; transition: border-color 0.2s; }
+.crit-card:focus-within { border-color: var(--teal-mid); }
+.crit-title { font-size: 15px; font-weight: 500; color: var(--dark); margin-bottom: 3px; }
+.crit-desc { font-size: 12px; font-weight: 300; color: var(--text-soft); margin-bottom: 14px; font-style: italic; line-height: 1.5; }
+
+/* ── SCALE 1-5 ── */
+.scale5-row { display: flex; gap: 6px; }
+.s5-btn {
+  flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px;
+  padding: 10px 6px; border: 1px solid var(--border); border-radius: var(--radius-sm);
+  background: var(--bg); cursor: pointer; transition: all 0.15s;
+  font-family: 'DM Sans', sans-serif;
+}
+.s5-btn:hover { border-color: var(--teal-mid); background: #F0FBFF; }
+.s5-btn.sel { background: var(--teal); border-color: var(--teal); }
+.s5-num { font-size: 18px; font-weight: 500; color: var(--text-mid); line-height: 1; transition: color 0.15s; }
+.s5-btn.sel .s5-num { color: white; }
+.s5-lab { font-size: 9px; font-weight: 400; color: var(--text-soft); text-align: center; line-height: 1.2; letter-spacing: 0.02em; transition: color 0.15s; }
+.s5-btn.sel .s5-lab { color: rgba(255,255,255,0.8); }
+.s5-labels { display: flex; justify-content: space-between; margin-top: 6px; font-size: 10px; color: var(--text-soft); font-style: italic; }
+
+/* ── OBS TEXTAREA ── */
+.obs-area { margin-top: 16px; }
+.obs-toggle { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-soft); cursor: pointer; background: none; border: none; font-family: 'DM Sans', sans-serif; transition: color 0.15s; padding: 0; }
+.obs-toggle:hover { color: var(--teal); }
+.obs-toggle svg { width: 14px; height: 14px; stroke: currentColor; fill: none; }
+.obs-textarea { display: none; width: 100%; margin-top: 10px; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 14px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 300; color: var(--text); background: var(--bg); resize: none; min-height: 72px; outline: none; transition: border-color 0.15s; line-height: 1.6; }
+.obs-textarea::placeholder { color: var(--text-soft); }
+.obs-textarea:focus { border-color: var(--teal); background: white; }
+.obs-textarea.open { display: block; }
+
+/* ── NAV ── */
+.a-nav { position: fixed; bottom: 0; left: 0; right: 0; z-index: 90; background: white; border-top: 1px solid var(--border); padding: 14px 32px; display: flex; align-items: center; justify-content: space-between; }
+.a-nav-info { font-size: 12px; color: var(--text-soft); }
+.nav-back { background: none; border: 1px solid var(--border); color: var(--text-mid); font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 400; padding: 11px 24px; border-radius: 50px; cursor: pointer; transition: all 0.15s; }
+.nav-back:hover { border-color: var(--border-mid); color: var(--dark); }
+.nav-next { background: var(--teal); border: none; color: white; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; padding: 11px 28px; border-radius: 50px; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.2s; }
+.nav-next:hover { background: var(--teal-dark); }
+.nav-next svg { width: 15px; height: 15px; stroke: currentColor; fill: none; }
+
+/* ── ERROR ── */
+.err-msg { display: none; background: #FEF2F2; border: 1px solid #FECACA; color: #DC2626; font-size: 13px; padding: 10px 14px; border-radius: var(--radius-sm); margin-top: 8px; }
+.err-msg.show { display: block; }
+
+/* ── OVERLAY ── */
+.overlay { display: none; position: fixed; inset: 0; z-index: 999; background: rgba(12,27,46,0.88); backdrop-filter: blur(4px); flex-direction: column; align-items: center; justify-content: center; gap: 16px; }
+.overlay.show { display: flex; }
+.spinner { width: 48px; height: 48px; border: 2px solid rgba(255,255,255,0.2); border-top-color: var(--teal); border-radius: 50%; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.overlay-text { color: rgba(255,255,255,0.7); font-size: 14px; font-weight: 300; letter-spacing: 0.05em; }
+
+/* ── SUCCESS ── */
+.success-page { display: none; min-height: 100vh; background: var(--bg); flex-direction: column; align-items: center; justify-content: center; padding: 48px 24px; text-align: center; }
+.success-page.show { display: flex; }
+.success-icon-wrap { width: 80px; height: 80px; border-radius: 50%; background: #DCFCE7; border: 2px solid #86EFAC; display: flex; align-items: center; justify-content: center; margin-bottom: 28px; }
+.success-icon-wrap svg { width: 36px; height: 36px; stroke: #16A34A; stroke-width: 2; fill: none; }
+.success-title { font-family: 'Playfair Display', serif; font-size: 40px; font-weight: 700; color: var(--dark); margin-bottom: 12px; line-height: 1.1; }
+.success-title em { font-style: italic; color: var(--teal); }
+.success-sub { font-size: 15px; font-weight: 300; color: var(--text-mid); line-height: 1.75; max-width: 480px; margin: 0 auto 32px; }
+.success-card { background: white; border: 1px solid var(--border); border-radius: var(--radius); padding: 24px 28px; max-width: 520px; width: 100%; text-align: left; margin-bottom: 12px; }
+.success-card-tag { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.12em; color: var(--gold); margin-bottom: 10px; }
+.success-card-title { font-size: 17px; font-weight: 500; color: var(--dark); margin-bottom: 8px; }
+.success-card-sub { font-size: 14px; font-weight: 300; color: var(--text-mid); line-height: 1.7; margin-bottom: 20px; }
+.btn-action { display: inline-flex; align-items: center; gap: 8px; background: var(--teal); color: white; text-decoration: none; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; padding: 12px 24px; border-radius: 50px; transition: all 0.2s; border: none; cursor: pointer; }
+.btn-action:hover { background: var(--teal-dark); }
+.btn-action svg { width: 15px; height: 15px; stroke: currentColor; fill: none; }
+
+/* ── TOP CRITERIA CHART ── */
+.top-crits { display: flex; flex-direction: column; gap: 10px; }
+.top-crit-row { display: flex; align-items: center; gap: 10px; }
+.top-crit-label { font-size: 13px; font-weight: 400; color: var(--dark); min-width: 160px; line-height: 1.3; }
+.top-crit-bar-wrap { flex: 1; background: var(--border); border-radius: 4px; height: 8px; overflow: hidden; }
+.top-crit-bar { height: 100%; background: var(--teal); border-radius: 4px; transition: width 0.8s ease; }
+.top-crit-val { font-size: 13px; font-weight: 500; color: var(--teal); min-width: 24px; text-align: right; }
+
+@media (max-width: 640px) {
+  .a-header { padding: 0 16px; }
+  .a-steps { padding: 12px 16px; }
+  .a-body { padding: 20px 16px 120px; }
+  .a-nav { padding: 12px 20px; }
+  .antes-card { padding: 24px 20px; }
+  .a-sec-header { flex-direction: column; gap: 8px; }
+  .fields-2 { grid-template-columns: 1fr; }
+  .scale5-row { gap: 4px; }
+  .s5-btn { padding: 8px 4px; }
+  .s5-num { font-size: 16px; }
+  .s5-lab { font-size: 8px; }
+}
+</style>
+</head>
+<body>
+
+<div class="overlay" id="overlay">
+  <div class="spinner"></div>
+  <div class="overlay-text">Enviando sua calibração…</div>
+</div>
+
+<!-- ═══ INTRO ═══ -->
+<div id="intro">
+  <div class="intro-logo">PAULO FRANÇA</div>
+  <div class="intro-eyebrow">Etapa 2 do Processo Consultivo</div>
+  <h1 class="intro-title">Questionário de<br><em>Calibração</em></h1>
+  <p class="intro-sub">Cada critério que você pondera aqui refina a curadoria dos imóveis que serão apresentados. Não há respostas certas — há a sua verdade.</p>
+  <button class="btn-start-pesos" onclick="showApp()">
+    Iniciar Calibração
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+  </button>
+  <div class="intro-trust">
+    <div class="intro-trust-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:14px;height:14px;"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+      ~5 min para concluir
+    </div>
+    <div class="intro-trust-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:14px;height:14px;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      Dados confidenciais
+    </div>
+    <div class="intro-trust-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:14px;height:14px;"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+      27 critérios · 7 dimensões
+    </div>
+  </div>
+</div>
+
+<!-- ═══ APP ═══ -->
+<div id="app">
+  <header class="a-header">
+    <div class="a-logo">PAULO FRANÇA</div>
+    <div class="a-header-right">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+      <span id="timeEst">~5 min restantes</span>
+    </div>
+  </header>
+  <div class="a-progress-bar"><div class="a-progress-fill" id="progressFill" style="width:0%"></div></div>
+
+  <div class="a-steps">
+    <div class="a-steps-inner" id="stepsInner">
+      <div class="a-step active" id="si-0"><div class="a-step-dot">✦</div><div class="a-step-label">Início</div></div>
+      <div class="a-step" id="si-1"><div class="a-step-dot">ID</div><div class="a-step-label">Você</div></div>
+      <div class="a-step" id="si-2"><div class="a-step-dot">1</div><div class="a-step-label">Localização</div></div>
+      <div class="a-step" id="si-3"><div class="a-step-dot">2</div><div class="a-step-label">Imóvel</div></div>
+      <div class="a-step" id="si-4"><div class="a-step-dot">3</div><div class="a-step-label">Segurança</div></div>
+      <div class="a-step" id="si-5"><div class="a-step-dot">4</div><div class="a-step-label">Lazer</div></div>
+      <div class="a-step" id="si-6"><div class="a-step-dot">5</div><div class="a-step-label">Financeiro</div></div>
+      <div class="a-step" id="si-7"><div class="a-step-dot">6</div><div class="a-step-label">Perfil</div></div>
+      <div class="a-step" id="si-8"><div class="a-step-dot">7</div><div class="a-step-label">Serviços</div></div>
+    </div>
+  </div>
+
+  <div class="a-body">
+
+    <!-- ══ TELA 0: ANTES DE COMEÇAR ══ -->
+    <div class="a-section active" id="s0">
+      <div class="antes-card">
+        <div class="antes-eyebrow">Antes de começar</div>
+        <div class="antes-title">Premissas da<br>minha curadoria</div>
+        <ul class="antes-list">
+          <li class="antes-item">
+            <div class="antes-icon"><svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg></div>
+            <div class="antes-item-text">
+              <strong>Conformidade legal e documental</strong>
+              <span>Toda recomendação passa por análise prévia de risco jurídico e patrimonial.</span>
+            </div>
+          </li>
+          <li class="antes-item">
+            <div class="antes-icon"><svg viewBox="0 0 24 24"><path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg></div>
+            <div class="antes-item-text">
+              <strong>Solidez e histórico de entrega</strong>
+              <span>Só apresento empreendimentos de construtoras com trajetória comprovada.</span>
+            </div>
+          </li>
+          <li class="antes-item">
+            <div class="antes-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg></div>
+            <div class="antes-item-text">
+              <strong>Visita técnica e leitura crítica</strong>
+              <span>Você recebe a curadoria já filtrada pelo meu olhar consultivo, não uma lista de portfólio.</span>
+            </div>
+          </li>
+        </ul>
+        <div class="antes-sign">O que segue agora são os critérios em que <em>sua preferência pessoal</em> define a curadoria — onde você mora dentro do que é, por princípio, bem selecionado.<br><br><strong>— Paulo</strong></div>
+      </div>
+      <div class="a-nav">
+        <div></div>
+        <div class="a-nav-info">Introdução</div>
+        <button class="nav-next" onclick="goTo(1)">Começar <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+      </div>
+    </div>
+
+    <!-- ══ TELA 1: IDENTIFICAÇÃO ══ -->
+    <div class="a-section" id="s1">
+      <div class="a-sec-header">
+        <div>
+          <div class="a-sec-eyebrow">Identificação</div>
+          <div class="a-sec-title">Quem é você?</div>
+          <div class="a-sec-intro">Para vincularmos este questionário à sua Anamnese e enviarmos o resultado.</div>
+        </div>
+      </div>
+      <div class="id-card">
+        <div class="id-intro">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:14px;height:14px;display:inline;margin-right:5px;"><path d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+          Informe o mesmo e-mail que usou na Anamnese para vincularmos as suas respostas.
+        </div>
+        <div class="field-group" style="margin-bottom:14px;">
+          <label class="field-lbl" for="id_name">Nome completo</label>
+          <input class="q-input" type="text" id="id_name" placeholder="Seu nome completo">
+        </div>
+        <div class="fields-2">
+          <div class="field-group">
+            <label class="field-lbl" for="id_email">E-mail</label>
+            <input class="q-input" type="email" id="id_email" placeholder="seu@email.com">
+            <div class="email-link-badge">
+              <svg viewBox="0 0 24 24"><path d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+              Mesmo e-mail da Anamnese
+            </div>
+          </div>
+          <div class="field-group">
+            <label class="field-lbl" for="id_phone">WhatsApp</label>
+            <input class="q-input" type="tel" id="id_phone" placeholder="(11) 9 0000-0000">
+          </div>
+        </div>
+      </div>
+      <div id="idErr" class="err-msg">Por favor, preencha nome e e-mail para continuar.</div>
+      <div class="a-nav">
+        <button class="nav-back" onclick="goTo(0)">← Voltar</button>
+        <div class="a-nav-info">Identificação</div>
+        <button class="nav-next" onclick="validateId()">Próximo <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+      </div>
+    </div>
+
+    <!-- ══ TELA 2: LOCALIZAÇÃO ══ -->
+    <div class="a-section" id="s2">
+      <div class="a-sec-header">
+        <div>
+          <div class="a-sec-eyebrow">Categoria 1 de 7</div>
+          <div class="a-sec-title">Localização</div>
+          <div class="a-sec-intro">Onde você quer acordar todos os dias. Endereço não é só geografia — é o ritmo da sua semana, o tempo que sobra, as pessoas que você encontra. Calibre o quanto cada dimensão da localização pesa na sua decisão.</div>
+        </div>
+        <div class="a-sec-badge">4 critérios</div>
+      </div>
+      <div class="crit-card">
+        <div class="crit-title">Perfil e reputação do bairro</div>
+        <div class="crit-desc">O bairro "diz algo" sobre você? A identidade e o prestígio da região importam na sua decisão.</div>
+        <div class="scale5-row" id="sc_loc1"></div>
+        <div class="s5-labels"><span>Pouco relevante</span><span>Essencial</span></div>
+        <div class="obs-area"><button class="obs-toggle" onclick="toggleObs(this)"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> Adicionar observação</button><textarea class="obs-textarea" placeholder="Algum detalhe específico sobre localização que queira registrar…"></textarea></div>
+      </div>
+      <div class="crit-card">
+        <div class="crit-title">Proximidade a trabalho, escola ou família</div>
+        <div class="crit-desc">Quanto tempo de deslocamento diário é aceitável para você?</div>
+        <div class="scale5-row" id="sc_loc2"></div>
+        <div class="s5-labels"><span>Pouco relevante</span><span>Essencial</span></div>
+        <div class="obs-area"><button class="obs-toggle" onclick="toggleObs(this)"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> Adicionar observação</button><textarea class="obs-textarea" placeholder="Referências específicas de distância ou tempo…"></textarea></div>
+      </div>
+      <div class="crit-card">
+        <div class="crit-title">Mobilidade urbana e acesso viário</div>
+        <div class="crit-desc">Transporte público, vias principais, proximidade ao aeroporto e fluidez do trânsito na região.</div>
+        <div class="scale5-row" id="sc_loc3"></div>
+        <div class="s5-labels"><span>Pouco relevante</span><span>Essencial</span></div>
+        <div class="obs-area"><button class="obs-toggle" onclick="toggleObs(this)"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> Adicionar observação</button><textarea class="obs-textarea" placeholder="Alguma via ou modal específico importante para você…"></textarea></div>
+      </div>
+      <div class="crit-card">
+        <div class="crit-title">Comércio, gastronomia e serviços a pé</div>
+        <div class="crit-desc">Você valoriza poder caminhar até cafés, padaria, academia, farmácia ou restaurantes?</div>
+        <div class="scale5-row" id="sc_loc4"></div>
+        <div class="s5-labels"><span>Pouco relevante</span><span>Essencial</span></div>
+        <div class="obs-area"><button class="obs-toggle" onclick="toggleObs(this)"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> Adicionar observação</button><textarea class="obs-textarea" placeholder="Serviços específicos que valoriza ter perto…"></textarea></div>
+      </div>
+      <div class="a-nav">
+        <button class="nav-back" onclick="goTo(1)">← Voltar</button>
+        <div class="a-nav-info">1 de 7</div>
+        <button class="nav-next" onclick="goTo(3)">Próximo <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+      </div>
+    </div>
+
+    <!-- ══ TELA 3: IMÓVEL ══ -->
+    <div class="a-section" id="s3">
+      <div class="a-sec-header">
+        <div>
+          <div class="a-sec-eyebrow">Categoria 2 de 7</div>
+          <div class="a-sec-title">O Imóvel em Si</div>
+          <div class="a-sec-intro">As paredes que vão te abrigar. Metragem, planta, luz, posição — os elementos físicos que definem como você vai habitar o espaço. Diga-me o que é essencial e o que é apenas desejável.</div>
+        </div>
+        <div class="a-sec-badge">4 critérios</div>
+      </div>
+      <div class="crit-card">
+        <div class="crit-title">Metragem e número de dormitórios / suítes</div>
+        <div class="crit-desc">O tamanho total e a configuração de quartos impactam diretamente o seu conforto e o da sua família.</div>
+        <div class="scale5-row" id="sc_imo1"></div>
+        <div class="s5-labels"><span>Pouco relevante</span><span>Essencial</span></div>
+        <div class="obs-area"><button class="obs-toggle" onclick="toggleObs(this)"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> Adicionar observação</button><textarea class="obs-textarea" placeholder="Metragem mínima ou número ideal de suítes…"></textarea></div>
+      </div>
+      <div class="crit-card">
+        <div class="crit-title">Funcionalidade da planta</div>
+        <div class="crit-desc">A planta faz sentido para a sua rotina? Circulação, integração dos ambientes e aproveitamento dos espaços.</div>
+        <div class="scale5-row" id="sc_imo2"></div>
+        <div class="s5-labels"><span>Pouco relevante</span><span>Essencial</span></div>
+        <div class="obs-area"><button class="obs-toggle" onclick="toggleObs(this)"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> Adicionar observação</button><textarea class="obs-textarea" placeholder="Algum elemento de planta que seja indispensável para você…"></textarea></div>
+      </div>
+      <div class="crit-card">
+        <div class="crit-title">Luminosidade e posição solar</div>
+        <div class="crit-desc">Sol da manhã, tarde, ventilação natural — o quanto a orientação solar influencia sua qualidade de vida?</div>
+        <div class="scale5-row" id="sc_imo3"></div>
+        <div class="s5-labels"><span>Pouco relevante</span><span>Essencial</span></div>
+        <div class="obs-area"><button class="obs-toggle" onclick="toggleObs(this)"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> Adicionar observação</button><textarea class="obs-textarea" placeholder="Orientação preferida (nascente, poente, norte, sul)…"></textarea></div>
+      </div>
+      <div class="crit-card">
+        <div class="crit-title">Vista e andar</div>
+        <div class="crit-desc">Vista livre, andar alto, privacidade visual — elementos que impactam o valor percebido do imóvel.</div>
+        <div class="scale5-row" id="sc_imo4"></div>
+        <div class="s5-labels"><span>Pouco relevante</span><span>Essencial</span></div>
+        <div class="obs-area"><button class="obs-toggle" onclick="toggleObs(this)"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> Adicionar observação</button><textarea class="obs-textarea" placeholder="Andar mínimo ou tipo de vista desejada…"></textarea></div>
+      </div>
+      <div class="a-nav">
+        <button class="nav-back" onclick="goTo(2)">← Voltar</button>
+        <div class="a-nav-info">2 de 7</div>
+        <button class="nav-next" onclick="goTo(4)">Próximo <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+      </div>
+    </div>
+
+    <!-- ══ TELA 4: SEGURANÇA ══ -->
+    <div class="a-section" id="s4">
+      <div class="a-sec-header">
+        <div>
+          <div class="a-sec-eyebrow">Categoria 3 de 7</div>
+          <div class="a-sec-title">Segurança e Infraestrutura</div>
+          <div class="a-sec-intro">A tranquilidade que mora junto. Segurança e infraestrutura são fundações invisíveis — quando funcionam, ninguém percebe; quando faltam, comprometem tudo. Pondere o peso de cada camada.</div>
+        </div>
+        <div class="a-sec-badge">3 critérios</div>
+      </div>
+      <div class="crit-card">
+        <div class="crit-title">Padrão de segurança do condomínio</div>
+        <div class="crit-desc">Portaria 24h, controle de acesso, sistema de monitoramento e blindagem do prédio.</div>
+        <div class="scale5-row" id="sc_seg1"></div>
+        <div class="s5-labels"><span>Pouco relevante</span><span>Essencial</span></div>
+        <div class="obs-area"><button class="obs-toggle" onclick="toggleObs(this)"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> Adicionar observação</button><textarea class="obs-textarea" placeholder="Alguma especificidade de segurança que seja prioridade…"></textarea></div>
+      </div>
+      <div class="crit-card">
+        <div class="crit-title">Infraestrutura técnica do prédio</div>
+        <div class="crit-desc">Gerador, fibra de alta velocidade, automação predial, vagas extras — a espinha dorsal invisível do condomínio.</div>
+        <div class="scale5-row" id="sc_seg2"></div>
+        <div class="s5-labels"><span>Pouco relevante</span><span>Essencial</span></div>
+        <div class="obs-area"><button class="obs-toggle" onclick="toggleObs(this)"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> Adicionar observação</button><textarea class="obs-textarea" placeholder="Algum item de infraestrutura que considere indispensável…"></textarea></div>
+      </div>
+      <div class="crit-card">
+        <div class="crit-title">Chegada e privacidade na entrada</div>
+        <div class="crit-desc">Porte-cochère, hall privativo, acesso discreto — a forma como você entra e sai do seu lar importa?</div>
+        <div class="scale5-row" id="sc_seg3"></div>
+        <div class="s5-labels"><span>Pouco relevante</span><span>Essencial</span></div>
+        <div class="obs-area"><button class="obs-toggle" onclick="toggleObs(this)"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> Adicionar observação</button><textarea class="obs-textarea" placeholder="Algum detalhe sobre chegada e privacidade…"></textarea></div>
+      </div>
+      <div class="a-nav">
+        <button class="nav-back" onclick="goTo(3)">← Voltar</button>
+        <div class="a-nav-info">3 de 7</div>
+        <button class="nav-next" onclick="goTo(5)">Próximo <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+      </div>
+    </div>
+
+    <!-- ══ TELA 5: LAZER ══ -->
+    <div class="a-section" id="s5">
+      <div class="a-sec-header">
+        <div>
+          <div class="a-sec-eyebrow">Categoria 4 de 7</div>
+          <div class="a-sec-title">Lazer e Estilo de Vida</div>
+          <div class="a-sec-intro">O que o imóvel oferece além de morar. Algumas pessoas querem um refúgio silencioso; outras, um condomínio que devolva tempo e convivência. Aqui você define qual é o seu caso.</div>
+        </div>
+        <div class="a-sec-badge">4 critérios</div>
+      </div>
+      <div class="crit-card">
+        <div class="crit-title">Espaços fitness e bem-estar</div>
+        <div class="crit-desc">Academia equipada, spa, sauna, piscina — a possibilidade de cuidar do corpo sem sair do condomínio.</div>
+        <div class="scale5-row" id="sc_laz1"></div>
+        <div class="s5-labels"><span>Pouco relevante</span><span>Essencial</span></div>
+        <div class="obs-area"><button class="obs-toggle" onclick="toggleObs(this)"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> Adicionar observação</button><textarea class="obs-textarea" placeholder="Equipamentos ou espaços específicos que valoriza…"></textarea></div>
+      </div>
+      <div class="crit-card">
+        <div class="crit-title">Espaços de convivência e trabalho</div>
+        <div class="crit-desc">Coworking, salões de festas, espaços gourmet, lounges — ambientes que ampliam a casa para além do apartamento.</div>
+        <div class="scale5-row" id="sc_laz2"></div>
+        <div class="s5-labels"><span>Pouco relevante</span><span>Essencial</span></div>
+        <div class="obs-area"><button class="obs-toggle" onclick="toggleObs(this)"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> Adicionar observação</button><textarea class="obs-textarea" placeholder="Como você usa esses espaços na sua rotina…"></textarea></div>
+      </div>
+      <div class="crit-card">
+        <div class="crit-title">Estrutura pet-friendly</div>
+        <div class="crit-desc">Pet place, pet care, áreas de passeio — o condomínio acolhe e cuida bem do seu animal?</div>
+        <div class="scale5-row" id="sc_laz3"></div>
+        <div class="s5-labels"><span>Não se aplica</span><span>Essencial</span></div>
+        <div class="obs-area"><button class="obs-toggle" onclick="toggleObs(this)"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> Adicionar observação</button><textarea class="obs-textarea" placeholder="Tipo de pet e necessidades específicas…"></textarea></div>
+      </div>
+      <div class="crit-card">
+        <div class="crit-title">Áreas verdes e contato com a natureza</div>
+        <div class="crit-desc">Jardins paisagísticos, bosques internos, hortas, espaços ao ar livre — a presença da natureza no cotidiano.</div>
+        <div class="scale5-row" id="sc_laz4"></div>
+        <div class="s5-labels"><span>Pouco relevante</span><span>Essencial</span></div>
+        <div class="obs-area"><button class="obs-toggle" onclick="toggleObs(this)"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> Adicionar observação</button><textarea class="obs-textarea" placeholder="Que tipo de contato com a natureza você valoriza…"></textarea></div>
+      </div>
+      <div class="a-nav">
+        <button class="nav-back" onclick="goTo(4)">← Voltar</button>
+        <div class="a-nav-info">4 de 7</div>
+        <button class="nav-next" onclick="goTo(6)">Próximo <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+      </div>
+    </div>
+
+    <!-- ══ TELA 6: FINANCEIRO ══ -->
+    <div class="a-section" id="s6">
+      <div class="a-sec-header">
+        <div>
+          <div class="a-sec-eyebrow">Categoria 5 de 7</div>
+          <div class="a-sec-title">Financeiro e Estratégia</div>
+          <div class="a-sec-intro">A inteligência por trás da decisão. Imóvel é também posição patrimonial — liquidez, valorização, custo de manter. Atribua peso à racionalidade que sustenta a escolha.</div>
+        </div>
+        <div class="a-sec-badge">4 critérios</div>
+      </div>
+      <div class="crit-card">
+        <div class="crit-title">Aderência ao orçamento</div>
+        <div class="crit-desc">O imóvel cabe confortavelmente no seu plano? Folga financeira versus máximo aproveitamento do capital.</div>
+        <div class="scale5-row" id="sc_fin1"></div>
+        <div class="s5-labels"><span>Pouco relevante</span><span>Essencial</span></div>
+        <div class="obs-area"><button class="obs-toggle" onclick="toggleObs(this)"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> Adicionar observação</button><textarea class="obs-textarea" placeholder="Alguma observação sobre sua margem orçamentária…"></textarea></div>
+      </div>
+      <div class="crit-card">
+        <div class="crit-title">Potencial de valorização</div>
+        <div class="crit-desc">Bairro em ascensão, entorno em desenvolvimento, infraestrutura futura — o imóvel cresce com você?</div>
+        <div class="scale5-row" id="sc_fin2"></div>
+        <div class="s5-labels"><span>Pouco relevante</span><span>Essencial</span></div>
+        <div class="obs-area"><button class="obs-toggle" onclick="toggleObs(this)"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> Adicionar observação</button><textarea class="obs-textarea" placeholder="Horizonte de valorização esperado…"></textarea></div>
+      </div>
+      <div class="crit-card">
+        <div class="crit-title">Liquidez de revenda</div>
+        <div class="crit-desc">Se um dia precisar vender, o imóvel sai rápido e bem? Mercado ativo, tipologia demandada, localização líquida.</div>
+        <div class="scale5-row" id="sc_fin3"></div>
+        <div class="s5-labels"><span>Pouco relevante</span><span>Essencial</span></div>
+        <div class="obs-area"><button class="obs-toggle" onclick="toggleObs(this)"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> Adicionar observação</button><textarea class="obs-textarea" placeholder="Prazo de revenda que você consideraria aceitável…"></textarea></div>
+      </div>
+      <div class="crit-card">
+        <div class="crit-title">Geração de renda por locação</div>
+        <div class="crit-desc">Pretende alugar o imóvel no futuro? O potencial de renda passiva é um critério relevante?</div>
+        <div class="scale5-row" id="sc_fin4"></div>
+        <div class="s5-labels"><span>Não se aplica</span><span>Essencial</span></div>
+        <div class="obs-area"><button class="obs-toggle" onclick="toggleObs(this)"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> Adicionar observação</button><textarea class="obs-textarea" placeholder="Tipo de locação pretendida (curta, longa, temporada)…"></textarea></div>
+      </div>
+      <div class="a-nav">
+        <button class="nav-back" onclick="goTo(5)">← Voltar</button>
+        <div class="a-nav-info">5 de 7</div>
+        <button class="nav-next" onclick="goTo(7)">Próximo <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+      </div>
+    </div>
+
+    <!-- ══ TELA 7: PERFIL ══ -->
+    <div class="a-section" id="s7">
+      <div class="a-sec-header">
+        <div>
+          <div class="a-sec-eyebrow">Categoria 6 de 7</div>
+          <div class="a-sec-title">Perfil do Empreendimento</div>
+          <div class="a-sec-intro">A assinatura por trás do projeto. Construtora, padrão, arquitetura e compromissos com sustentabilidade — o DNA do produto importa tanto quanto o produto em si. Calibre o que pesa para você.</div>
+        </div>
+        <div class="a-sec-badge">4 critérios</div>
+      </div>
+      <div class="crit-card">
+        <div class="crit-title">Afinidade com o DNA da construtora</div>
+        <div class="crit-desc">Cada construtora tem uma assinatura — design, posicionamento, perfil de morador. Há alguma com a qual você se identifica mais?</div>
+        <div class="scale5-row" id="sc_per1"></div>
+        <div class="s5-labels"><span>Indiferente</span><span>Muito relevante</span></div>
+        <div class="obs-area"><button class="obs-toggle" onclick="toggleObs(this)"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> Adicionar observação</button><textarea class="obs-textarea" placeholder="Construtoras de referência ou que admira…"></textarea></div>
+      </div>
+      <div class="crit-card">
+        <div class="crit-title">Padrão construtivo e acabamentos</div>
+        <div class="crit-desc">Qualidade dos materiais, especificação técnica, marcenaria, revestimentos — o nível de acabamento do produto.</div>
+        <div class="scale5-row" id="sc_per2"></div>
+        <div class="s5-labels"><span>Pouco relevante</span><span>Essencial</span></div>
+        <div class="obs-area"><button class="obs-toggle" onclick="toggleObs(this)"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> Adicionar observação</button><textarea class="obs-textarea" placeholder="Elementos de acabamento que considera indispensáveis…"></textarea></div>
+      </div>
+      <div class="crit-card">
+        <div class="crit-title">Arquitetura e assinatura do projeto</div>
+        <div class="crit-desc">Projetos com arquitetos renomados, design de interiores assinado, paisagismo de autor — a autoria importa?</div>
+        <div class="scale5-row" id="sc_per3"></div>
+        <div class="s5-labels"><span>Indiferente</span><span>Muito relevante</span></div>
+        <div class="obs-area"><button class="obs-toggle" onclick="toggleObs(this)"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> Adicionar observação</button><textarea class="obs-textarea" placeholder="Arquitetos ou escritórios de referência…"></textarea></div>
+      </div>
+      <div class="crit-card">
+        <div class="crit-title">Sustentabilidade, eficiência e tecnologia embarcada</div>
+        <div class="crit-desc">Selos AQUA/LEED, eficiência energética, captação de água, smart home — o quanto esses elementos pesam?</div>
+        <div class="scale5-row" id="sc_per4"></div>
+        <div class="s5-labels"><span>Pouco relevante</span><span>Essencial</span></div>
+        <div class="obs-area"><button class="obs-toggle" onclick="toggleObs(this)"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> Adicionar observação</button><textarea class="obs-textarea" placeholder="Tecnologias ou certificações que valoriza…"></textarea></div>
+      </div>
+      <div class="a-nav">
+        <button class="nav-back" onclick="goTo(6)">← Voltar</button>
+        <div class="a-nav-info">6 de 7</div>
+        <button class="nav-next" onclick="goTo(8)">Próximo <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+      </div>
+    </div>
+
+    <!-- ══ TELA 8: SERVIÇOS ══ -->
+    <div class="a-section" id="s8">
+      <div class="a-sec-header">
+        <div>
+          <div class="a-sec-eyebrow">Categoria 7 de 7</div>
+          <div class="a-sec-title">Serviços e Curadoria de Marca</div>
+          <div class="a-sec-intro">Quando morar se aproxima de ser hospedado. Wellness, hospitalidade, serviços de marca e propostas de longevidade são camadas que transformam o imóvel em experiência contínua. Diga-me o quanto isso faz parte da sua expectativa.</div>
+        </div>
+        <div class="a-sec-badge">4 critérios</div>
+      </div>
+      <div class="crit-card">
+        <div class="crit-title">Wellness</div>
+        <div class="crit-desc">Estrutura e serviços voltados ao seu bem-estar diário — spa, terapias, nutrição, práticas integrativas dentro do próprio condomínio.</div>
+        <div class="scale5-row" id="sc_srv1"></div>
+        <div class="s5-labels"><span>Não me atrai</span><span>Decisivo para mim</span></div>
+        <div class="obs-area"><button class="obs-toggle" onclick="toggleObs(this)"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> Adicionar observação</button><textarea class="obs-textarea" placeholder="Práticas ou serviços de wellness que valoriza…"></textarea></div>
+      </div>
+      <div class="crit-card">
+        <div class="crit-title">Longevity Living</div>
+        <div class="crit-desc">Ambiente projetado para sustentar saúde e autonomia ao longo das décadas — desde ergonomia dos espaços até parcerias com medicina preventiva.</div>
+        <div class="scale5-row" id="sc_srv2"></div>
+        <div class="s5-labels"><span>Não me atrai</span><span>Decisivo para mim</span></div>
+        <div class="obs-area"><button class="obs-toggle" onclick="toggleObs(this)"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> Adicionar observação</button><textarea class="obs-textarea" placeholder="Aspectos de longevidade que considera prioritários…"></textarea></div>
+      </div>
+      <div class="crit-card">
+        <div class="crit-title">Branded Residences</div>
+        <div class="crit-desc">Residências assinadas por marcas globais de luxo — hotelaria, moda, design — agregando identidade, padrão e valor patrimonial diferenciado.</div>
+        <div class="scale5-row" id="sc_srv3"></div>
+        <div class="s5-labels"><span>Não me atrai</span><span>Decisivo para mim</span></div>
+        <div class="obs-area"><button class="obs-toggle" onclick="toggleObs(this)"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> Adicionar observação</button><textarea class="obs-textarea" placeholder="Marcas ou segmentos de branded residences de referência…"></textarea></div>
+      </div>
+      <div class="crit-card">
+        <div class="crit-title">Hospitality Services</div>
+        <div class="crit-desc">Serviços de hotelaria no dia a dia — concierge, room service, governança, valet, recepção de hóspedes — operados com padrão internacional.</div>
+        <div class="scale5-row" id="sc_srv4"></div>
+        <div class="s5-labels"><span>Não me atrai</span><span>Decisivo para mim</span></div>
+        <div class="obs-area"><button class="obs-toggle" onclick="toggleObs(this)"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> Adicionar observação</button><textarea class="obs-textarea" placeholder="Serviços de hospitalidade que considera ideais…"></textarea></div>
+      </div>
+      <div id="submitErr" class="err-msg">Ocorreu um erro ao enviar. Verifique sua conexão e tente novamente.</div>
+      <div class="a-nav">
+        <button class="nav-back" onclick="goTo(7)">← Voltar</button>
+        <div class="a-nav-info">7 de 7</div>
+        <button class="nav-next" id="submitBtn" onclick="submitForm()" style="background:#16A34A;">
+          Concluir Calibração
+          <svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+        </button>
+      </div>
+    </div>
+
+  </div><!-- /a-body -->
+
+  <!-- ══ SUCCESS ══ -->
+  <div class="success-page" id="successPage">
+    <div class="success-icon-wrap">
+      <svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+    </div>
+    <h2 class="success-title">Calibração <em>concluída!</em></h2>
+    <p class="success-sub">Obrigado, <strong id="successName" style="font-weight:500;"></strong>. Suas preferências foram registradas e já fazem parte da curadoria.</p>
+
+    <div class="success-card" style="max-width:520px; margin-bottom:12px;">
+      <div class="success-card-tag">Suas prioridades — Top 5</div>
+      <div id="topCrits" class="top-crits" style="margin-top:8px;"></div>
+    </div>
+
+    <div class="success-card" style="max-width:520px;">
+      <div class="success-card-tag">Próximo passo</div>
+      <div class="success-card-title">Consultoria Exclusiva — 15 minutos</div>
+      <div class="success-card-sub">Paulo analisará seu diagnóstico completo e entrará em contato para apresentar os imóveis mais alinhados ao seu perfil.</div>
+      <a class="btn-action" href="https://calendar.app.google/dffTZGue9T52RuEe9" target="_blank">
+        <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Agendar minha consultoria
+      </a>
+
+      <div style="margin-top:20px;display:flex;flex-direction:column;gap:10px;max-width:480px;margin-left:auto;margin-right:auto;">
+        <button onclick="exportPesos()" style="display:inline-flex;align-items:center;gap:8px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;padding:12px 20px;border-radius:8px;cursor:pointer;border:1px solid #CBD5E1;background:white;color:#1E293B;width:100%;justify-content:center;transition:all 0.2s;" onmouseover="this.style.background='#F8FAFC'" onmouseout="this.style.background='white'">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;flex-shrink:0"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Baixar só os Pesos (JSON)
+        </button>
+        <button onclick="mergeAndExport()" style="display:inline-flex;align-items:center;gap:8px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;padding:12px 20px;border-radius:8px;cursor:pointer;background:#0891B2;color:white;border:none;width:100%;justify-content:center;transition:all 0.2s;" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;flex-shrink:0"><path d="M8 17l4 4 4-4"/><path d="M12 12v9"/><path d="M20.88 18.09A5 5 0 0018 9h-1.26A8 8 0 103 16.29"/></svg>
+          Mesclar com Anamnese + Baixar Perfil Completo
+        </button>
+        <p style="font-size:11px;color:#94A3B8;text-align:center;line-height:1.5;margin-top:4px;">O <strong>Perfil Completo</strong> une Anamnese + Pesos num único arquivo — use-o no Motor de Compatibilidade para cruzar com os imóveis do banco.</p>
+      </div>
+    </div>
+    <p style="font-size:12px;color:var(--text-soft);font-style:italic;margin-top:12px;">Agenda disponível a partir de 2 dias úteis após esta data.</p>
+  </div>
+
+</div><!-- /app -->
+
+<script>
+emailjs.init("D8d3opazl1_fH0PVL");
+
+let cur = 0;
+const scaleData = {}; // { sc_id: value }
+const times = ['','~5 min restantes','~4 min restantes','~4 min restantes','~3 min restantes','~2 min restantes','~2 min restantes','~1 min restante','~1 min restante'];
+const TOTAL = 8;
+
+const scaleDefs = [
+  { id:'sc_loc1', cat:'Localização', label:'Perfil e reputação do bairro' },
+  { id:'sc_loc2', cat:'Localização', label:'Proximidade a trabalho, escola ou família' },
+  { id:'sc_loc3', cat:'Localização', label:'Mobilidade urbana e acesso viário' },
+  { id:'sc_loc4', cat:'Localização', label:'Comércio e serviços a pé' },
+  { id:'sc_imo1', cat:'Imóvel', label:'Metragem e dormitórios' },
+  { id:'sc_imo2', cat:'Imóvel', label:'Funcionalidade da planta' },
+  { id:'sc_imo3', cat:'Imóvel', label:'Luminosidade e posição solar' },
+  { id:'sc_imo4', cat:'Imóvel', label:'Vista e andar' },
+  { id:'sc_seg1', cat:'Segurança', label:'Padrão de segurança do condomínio' },
+  { id:'sc_seg2', cat:'Segurança', label:'Infraestrutura técnica do prédio' },
+  { id:'sc_seg3', cat:'Segurança', label:'Chegada e privacidade na entrada' },
+  { id:'sc_laz1', cat:'Lazer', label:'Espaços fitness e bem-estar' },
+  { id:'sc_laz2', cat:'Lazer', label:'Espaços de convivência e trabalho' },
+  { id:'sc_laz3', cat:'Lazer', label:'Estrutura pet-friendly' },
+  { id:'sc_laz4', cat:'Lazer', label:'Áreas verdes e natureza' },
+  { id:'sc_fin1', cat:'Financeiro', label:'Aderência ao orçamento' },
+  { id:'sc_fin2', cat:'Financeiro', label:'Potencial de valorização' },
+  { id:'sc_fin3', cat:'Financeiro', label:'Liquidez de revenda' },
+  { id:'sc_fin4', cat:'Financeiro', label:'Geração de renda por locação' },
+  { id:'sc_per1', cat:'Perfil', label:'Afinidade com o DNA da construtora' },
+  { id:'sc_per2', cat:'Perfil', label:'Padrão construtivo e acabamentos' },
+  { id:'sc_per3', cat:'Perfil', label:'Arquitetura e assinatura do projeto' },
+  { id:'sc_per4', cat:'Perfil', label:'Sustentabilidade, eficiência e tecnologia' },
+  { id:'sc_srv1', cat:'Serviços', label:'Wellness' },
+  { id:'sc_srv2', cat:'Serviços', label:'Longevity Living' },
+  { id:'sc_srv3', cat:'Serviços', label:'Branded Residences' },
+  { id:'sc_srv4', cat:'Serviços', label:'Hospitality Services' },
+];
+
+const scaleLabels = ['','Baixa prioridade','Considera','Importante','Muito importante','Essencial'];
+
+function buildScales() {
+  scaleDefs.forEach(def => {
+    const el = document.getElementById(def.id);
+    if (!el) return;
+    el.innerHTML = '';
+    for (let v = 1; v <= 5; v++) {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 's5-btn';
+      btn.dataset.sc = def.id;
+      btn.dataset.v = v;
+      btn.innerHTML = `<span class="s5-num">${v}</span><span class="s5-lab">${scaleLabels[v]}</span>`;
+      btn.addEventListener('click', function() {
+        scaleData[def.id] = v;
+        el.querySelectorAll('.s5-btn').forEach(b => b.classList.toggle('sel', parseInt(b.dataset.v) === v));
+      });
+      el.appendChild(btn);
+    }
+  });
+}
+buildScales();
+
+function showApp() {
+  document.getElementById('intro').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  window.scrollTo(0, 0);
+}
+
+function goTo(n) {
+  document.getElementById('s' + cur).classList.remove('active');
+  const prevInd = document.getElementById('si-' + cur);
+  if (prevInd) { prevInd.classList.remove('active'); if (n > cur) prevInd.classList.add('done'); }
+  cur = n;
+  const sec = document.getElementById('s' + cur);
+  if (sec) { sec.classList.add('active'); window.scrollTo(0, 0); }
+  const ind = document.getElementById('si-' + cur);
+  if (ind) { ind.classList.add('active'); ind.classList.remove('done'); }
+  const pct = (cur / TOTAL * 100).toFixed(0);
+  document.getElementById('progressFill').style.width = pct + '%';
+  const t = document.getElementById('timeEst');
+  if (t && times[cur]) t.textContent = times[cur];
+}
+
+function validateId() {
+  const name = document.getElementById('id_name').value.trim();
+  const email = document.getElementById('id_email').value.trim();
+  const err = document.getElementById('idErr');
+  err.classList.remove('show');
+  if (!name || !email) { err.classList.add('show'); return; }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    err.textContent = 'Por favor, insira um e-mail válido.';
+    err.classList.add('show'); return;
+  }
+  goTo(2);
+}
+
+function toggleObs(btn) {
+  const ta = btn.nextElementSibling;
+  ta.classList.toggle('open');
+  btn.innerHTML = ta.classList.contains('open')
+    ? '<svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none"><path d="M5 12h14"/></svg> Remover observação'
+    : '<svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none"><path d="M12 5v14M5 12h14"/></svg> Adicionar observação';
+}
+
+function getVal(id) { const el = document.getElementById(id); return el && el.value.trim() ? el.value.trim() : '—'; }
+
+function buildEmailBody() {
+  const name = getVal('id_name'), email = getVal('id_email'), phone = getVal('id_phone');
+  let body = `QUESTIONÁRIO DE CALIBRAÇÃO — PAULO FRANÇA\nData: ${new Date().toLocaleString('pt-BR')}\n\nCLIENTE\nNome: ${name}\nE-mail: ${email}\nTelefone: ${phone}\n\n`;
+
+  const cats = ['Localização','Imóvel em Si','Segurança e Infraestrutura','Lazer e Estilo de Vida','Financeiro e Estratégia','Perfil do Empreendimento','Serviços e Curadoria de Marca'];
+  const groups = [
+    ['sc_loc1','sc_loc2','sc_loc3','sc_loc4'],
+    ['sc_imo1','sc_imo2','sc_imo3','sc_imo4'],
+    ['sc_seg1','sc_seg2','sc_seg3'],
+    ['sc_laz1','sc_laz2','sc_laz3','sc_laz4'],
+    ['sc_fin1','sc_fin2','sc_fin3','sc_fin4'],
+    ['sc_per1','sc_per2','sc_per3','sc_per4'],
+    ['sc_srv1','sc_srv2','sc_srv3','sc_srv4'],
+  ];
+  groups.forEach((grp, i) => {
+    body += `━━━ ${cats[i].toUpperCase()} ━━━\n`;
+    grp.forEach(id => {
+      const def = scaleDefs.find(d => d.id === id);
+      const v = scaleData[id] || '—';
+      const lab = v !== '—' ? ` (${scaleLabels[v]})` : '';
+      body += `${def.label}: ${v}${lab}\n`;
+    });
+    body += '\n';
+  });
+  return body;
+}
+
+function buildTopCrits() {
+  const sorted = scaleDefs
+    .filter(d => scaleData[d.id])
+    .map(d => ({ label: d.label, cat: d.cat, v: scaleData[d.id] }))
+    .sort((a, b) => b.v - a.v)
+    .slice(0, 5);
+
+  const el = document.getElementById('topCrits');
+  if (!el) return;
+  el.innerHTML = sorted.map(s => `
+    <div class="top-crit-row">
+      <div class="top-crit-label">${s.label}<br><span style="font-size:10px;color:var(--text-soft);">${s.cat}</span></div>
+      <div class="top-crit-bar-wrap"><div class="top-crit-bar" style="width:${s.v * 20}%"></div></div>
+      <div class="top-crit-val">${s.v}/5</div>
+    </div>`).join('');
+}
+
+async function submitForm() {
+  const name = getVal('id_name'), email = getVal('id_email');
+  const err = document.getElementById('submitErr');
+  err.classList.remove('show');
+  document.getElementById('overlay').classList.add('show');
+  document.getElementById('submitBtn').disabled = true;
+
+  // ── PASSO 1: salva perfil + download ANTES do e-mail (garante funcionamento mesmo se e-mail falhar) ──
+  const pesosData = buildPesosProfile();
+  let perfilFinal = pesosData;
+
+  try {
+    const anamnesesalva = localStorage.getItem('pf_perfil_cliente');
+    if (anamnesesalva) {
+      const anamnese = JSON.parse(anamnesesalva);
+      perfilFinal = Object.assign({}, anamnese, {
+        _versao: 'perfil_completo_v1',
+        _exportadoEm: new Date().toISOString(),
+        _fontes: ['anamnese_v3_7_2', 'pesos_v2'],
+        pesos: pesosData.pesos
+      });
+    }
+  } catch(e) { console.warn('Merge com anamnese falhou:', e); }
+
+  // Salva no localStorage para o Motor detectar automaticamente
+  localStorage.setItem('pf_perfil_cliente', JSON.stringify(perfilFinal));
+  localStorage.setItem('pf_perfil_etapa', 'completo');
+
+  // Download automático do perfil completo como backup
+  try {
+    const nomeSafe = perfilFinal.nome.replace(/[^a-zA-Z0-9]/g, '_');
+    const dataHoje = new Date().toISOString().slice(0, 10);
+    const nomeArq = perfilFinal._versao === 'perfil_completo_v1'
+      ? 'perfil_completo_' + nomeSafe + '_' + dataHoje + '.json'
+      : 'pesos_' + nomeSafe + '_' + dataHoje + '.json';
+    const blob = new Blob([JSON.stringify(perfilFinal, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = nomeArq;
+    document.body.appendChild(a); a.click();
+    document.body.removeChild(a); URL.revokeObjectURL(a.href);
+  } catch(e) { console.warn('Auto-download falhou:', e); }
+
+  // ── PASSO 2: mostra tela de sucesso ──
+  document.getElementById('overlay').classList.remove('show');
+  document.getElementById('s8').classList.remove('active');
+  document.querySelector('.a-steps').style.display = 'none';
+  document.querySelector('.a-progress-bar').style.display = 'none';
+  document.getElementById('successName').textContent = name;
+  buildTopCrits();
+  document.getElementById('successPage').classList.add('show');
+  window.scrollTo(0, 0);
+
+  // ── PASSO 3: tenta enviar e-mail em background (silencioso se falhar) ──
+  const body = buildEmailBody();
+  try {
+    await emailjs.send('service_alesa01', 'template_pesos_v1', {
+      to_email: 'paulofranca.spimoveis@gmail.com', to_name: 'Paulo França',
+      from_name: name, client_email: email,
+      subject: 'Questionário de Calibração — ' + name,
+      message: body
+    });
+    await emailjs.send('service_alesa01', 'template_pesos_v1', {
+      to_email: email, to_name: name, from_name: 'Paulo França',
+      subject: 'Sua Calibração foi recebida',
+      message: 'Olá, ' + name + '!\n\nSeu Questionário de Calibração foi concluído com sucesso.\n\nPaulo analisará suas preferências e entrará em contato para apresentar uma seleção de imóveis alinhados ao seu perfil.\n\nAtenciosamente,\nPaulo França'
+    });
+  } catch(e) {
+    // E-mail falhou mas perfil já foi salvo e baixado — não bloqueia o cliente
+    console.warn('E-mail não enviado (template não configurado):', e);
+  }
+}
+// ══ EXPORTAR PESOS (JSON) ══
+function buildPesosProfile() {
+  const name = getVal('id_name');
+  const email = getVal('id_email');
+  const phone = getVal('id_phone');
+  const pesos = {};
+  scaleDefs.forEach(d => { pesos[d.id] = scaleData[d.id] || null; });
+  return {
+    _versao: 'pesos_v2',
+    _exportadoEm: new Date().toISOString(),
+    nome: name,
+    email: email,
+    telefone: phone,
+    pesos: pesos
+  };
+}
+
+function exportPesos() {
+  const profile = buildPesosProfile();
+  const nomeSafe = profile.nome.replace(/[^a-zA-Z0-9]/g, '_');
+  const data = new Date().toISOString().slice(0, 10);
+  const blob = new Blob([JSON.stringify(profile, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'pesos_' + nomeSafe + '_' + data + '.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(a.href);
+}
+
+function mergeAndExport() {
+  // Permite ao Paulo importar o perfil da Anamnese e mesclar com os pesos
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.json';
+  input.onchange = function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+      try {
+        const anamnese = JSON.parse(ev.target.result);
+        const pesos = buildPesosProfile();
+        // Merge: anamnese base + pesos do questionário
+        const merged = Object.assign({}, anamnese, {
+          _versao: 'perfil_completo_v1',
+          _exportadoEm: new Date().toISOString(),
+          _fontes: ['anamnese_v3_7_2', 'pesos_v2'],
+          pesos: pesos.pesos
+        });
+        const nomeSafe = merged.nome.replace(/[^a-zA-Z0-9]/g, '_');
+        const data = new Date().toISOString().slice(0, 10);
+        const blob = new Blob([JSON.stringify(merged, null, 2)], { type: 'application/json' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'perfil_completo_' + nomeSafe + '_' + data + '.json';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(a.href);
+        alert('Perfil completo exportado com sucesso!');
+      } catch(err) {
+        alert('Erro ao mesclar: JSON inválido. Verifique se o arquivo é o perfil correto da Anamnese.');
+      }
+    };
+    reader.readAsText(file);
+  };
+  input.click();
+}
+
+</script>
+</body>
+</html>

@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Motor de Compatibilidade — Paulo França</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+:root {
+  --teal:#0891B2;--teal-dark:#0E7490;--teal-light:#E0F7FA;--teal-mid:#BAE6FD;
+  --gold:#C4933F;--gold-light:#FEF3C7;
+  --dark:#0C1B2E;--text:#1E293B;--text-mid:#475569;--text-soft:#94A3B8;
+  --bg:#F8FAFC;--white:#FFFFFF;--border:#E2E8F0;--border-mid:#CBD5E1;
+  --green:#16A34A;--green-light:#DCFCE7;
+  --red:#DC2626;--red-light:#FEE2E2;
+  --amber:#D97706;--amber-light:#FEF3C7;
+  --radius:12px;--radius-sm:8px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+
+/* HEADER */
+.header{background:var(--dark);padding:0 32px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;border-bottom:1px solid rgba(255,255,255,0.08);}
+.header-logo{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:0.12em;color:white;}
+.header-badge{font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);}
+.header-right{display:flex;align-items:center;gap:10px;}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:6px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;padding:8px 16px;border-radius:var(--radius-sm);cursor:pointer;border:1px solid var(--border);background:white;color:var(--text);transition:all 0.15s;white-space:nowrap;}
+.btn:hover{background:var(--bg);border-color:var(--border-mid);}
+.btn.primary{background:var(--teal);color:white;border-color:var(--teal);}
+.btn.primary:hover{background:var(--teal-dark);}
+.btn.ghost{background:transparent;border-color:rgba(255,255,255,0.2);color:rgba(255,255,255,0.7);}
+.btn.ghost:hover{background:rgba(255,255,255,0.08);color:white;}
+.btn.success{background:var(--green);color:white;border-color:var(--green);}
+.btn-icon{width:14px;height:14px;flex-shrink:0;}
+
+/* LAYOUT */
+.main{max-width:1100px;margin:0 auto;padding:28px 24px 80px;}
+
+/* SETUP PANEL */
+.setup-panel{background:white;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:24px;}
+.setup-header{padding:20px 28px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;}
+.setup-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--dark);}
+.setup-body{padding:24px 28px;display:grid;grid-template-columns:1fr 1fr;gap:24px;}
+.setup-col{}
+.setup-col-title{font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:var(--teal);margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--teal-light);}
+
+/* CLIENTE CARD */
+.cliente-card{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px 20px;}
+.cliente-card.loaded{border-color:var(--green);background:var(--green-light);}
+.cliente-name{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--dark);margin-bottom:4px;}
+.cliente-meta{font-size:12px;color:var(--text-mid);line-height:1.6;}
+.cliente-badge{display:inline-block;font-size:10px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;padding:3px 8px;border-radius:50px;background:var(--green-light);color:var(--green);border:1px solid var(--green);margin-bottom:10px;}
+.cliente-empty{text-align:center;padding:24px 16px;color:var(--text-soft);}
+.cliente-empty-icon{font-size:28px;margin-bottom:8px;opacity:0.5;}
+.cliente-empty-text{font-size:13px;}
+
+/* IMOVEIS SELECTION */
+.imoveis-list{display:flex;flex-direction:column;gap:8px;max-height:320px;overflow-y:auto;}
+.imovel-check-item{display:flex;align-items:center;gap:10px;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;transition:all 0.15s;user-select:none;}
+.imovel-check-item:hover{border-color:var(--teal);background:var(--teal-light);}
+.imovel-check-item.selected{border-color:var(--teal);background:var(--teal-light);}
+.imovel-check-item input{display:none;}
+.imovel-chk{width:16px;height:16px;border:2px solid var(--border-mid);border-radius:4px;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all 0.15s;}
+.imovel-check-item.selected .imovel-chk{background:var(--teal);border-color:var(--teal);}
+.imovel-check-item.selected .imovel-chk::after{content:'';width:8px;height:5px;border-left:2px solid white;border-bottom:2px solid white;transform:rotate(-45deg) translateY(-1px);display:block;}
+.imovel-info{flex:1;}
+.imovel-info-nome{font-size:13px;font-weight:500;color:var(--dark);}
+.imovel-info-sub{font-size:11px;color:var(--text-soft);margin-top:2px;}
+.imovel-valor{font-size:12px;color:var(--text-mid);white-space:nowrap;}
+.empty-imoveis{text-align:center;padding:32px 16px;color:var(--text-soft);font-size:13px;}
+
+/* RUN BAR */
+.run-bar{background:white;border:1px solid var(--border);border-radius:var(--radius);padding:16px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:28px;flex-wrap:wrap;}
+.run-status{font-size:13px;color:var(--text-mid);}
+.run-status strong{color:var(--dark);}
+
+/* RESULTS */
+.results-section{display:none;}
+.results-section.show{display:block;}
+
+/* RANKING */
+.ranking-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;margin-bottom:28px;}
+.ranking-card{background:white;border:1px solid var(--border);border-radius:var(--radius);padding:22px 24px;position:relative;transition:box-shadow 0.2s;cursor:pointer;}
+.ranking-card:hover{box-shadow:0 4px 20px rgba(0,0,0,0.08);}
+.ranking-card.rank-1{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold);}
+.ranking-medal{position:absolute;top:16px;right:16px;font-size:22px;}
+.ranking-nome{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:var(--dark);margin-bottom:4px;margin-right:36px;}
+.ranking-sub{font-size:12px;color:var(--text-mid);margin-bottom:16px;}
+.ranking-score-wrap{display:flex;align-items:center;gap:12px;margin-bottom:14px;}
+.ranking-score-num{font-family:'Playfair Display',serif;font-size:36px;font-weight:900;line-height:1;}
+.ranking-score-label{font-size:11px;color:var(--text-soft);line-height:1.4;}
+.ranking-score-bar-track{flex:1;height:8px;background:var(--border);border-radius:50px;overflow:hidden;}
+.ranking-score-bar-fill{height:100%;border-radius:50px;transition:width 0.6s ease;}
+.ranking-cats{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.ranking-cat-row{display:flex;align-items:center;gap:6px;}
+.ranking-cat-label{font-size:11px;color:var(--text-mid);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ranking-cat-bar{flex:1;height:4px;background:var(--border);border-radius:50px;overflow:hidden;}
+.ranking-cat-fill{height:100%;border-radius:50px;}
+.ranking-cat-val{font-size:11px;font-weight:600;min-width:28px;text-align:right;}
+
+/* DETAIL REPORT */
+.report-wrap{background:white;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:20px;}
+.report-header{padding:24px 32px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;}
+.report-title{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--dark);margin-bottom:4px;}
+.report-sub{font-size:13px;color:var(--text-mid);}
+.report-score-badge{text-align:center;flex-shrink:0;}
+.report-score-num{font-family:'Playfair Display',serif;font-size:48px;font-weight:900;line-height:1;}
+.report-score-label{font-size:11px;color:var(--text-soft);text-transform:uppercase;letter-spacing:0.1em;}
+.report-body{padding:28px 32px;display:grid;grid-template-columns:1fr 1fr;gap:28px;}
+.report-section-title{font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:var(--teal);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--teal-light);}
+
+/* SINERGIA BARS */
+.sinergia-list{display:flex;flex-direction:column;gap:10px;}
+.sinergia-row{display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:10px;}
+.sinergia-label{font-size:12px;color:var(--text-mid);}
+.sinergia-bar-wrap{display:flex;align-items:center;gap:8px;}
+.sinergia-track{width:100px;height:6px;background:var(--border);border-radius:50px;overflow:hidden;}
+.sinergia-fill{height:100%;border-radius:50px;}
+.sinergia-val{font-size:12px;font-weight:600;min-width:32px;text-align:right;}
+.sinergia-peso{font-size:10px;color:var(--text-soft);min-width:28px;text-align:right;}
+
+/* PONTOS CARDS */
+.pontos-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px;}
+.ponto-card{padding:12px 14px;border-radius:var(--radius-sm);border:1px solid;}
+.ponto-card.forte{background:var(--green-light);border-color:#86EFAC;color:var(--green);}
+.ponto-card.atencao{background:var(--amber-light);border-color:#FCD34D;color:var(--amber);}
+.ponto-card-label{font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;opacity:0.8;}
+.ponto-card-text{font-size:12px;line-height:1.5;color:var(--dark);}
+
+/* PERFIL CLIENTE SUMMARY */
+.perfil-summary{background:var(--bg);border-radius:var(--radius-sm);padding:16px 20px;}
+.perfil-row{display:flex;justify-content:space-between;align-items:flex-start;padding:6px 0;border-bottom:1px solid var(--border);gap:12px;}
+.perfil-row:last-child{border-bottom:none;}
+.perfil-label{font-size:12px;color:var(--text-soft);white-space:nowrap;}
+.perfil-value{font-size:12px;color:var(--dark);text-align:right;max-width:55%;}
+
+/* NARRATIVA */
+.narrativa-box{background:var(--bg);border-left:3px solid var(--teal);border-radius:0 var(--radius-sm) var(--radius-sm) 0;padding:16px 20px;font-size:13px;color:var(--text);line-height:1.7;font-style:italic;}
+
+/* PRINT */
+.report-print-bar{display:flex;justify-content:flex-end;gap:8px;padding:16px 32px;border-top:1px solid var(--border);}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;z-index:600;background:var(--dark);color:white;font-size:13px;padding:12px 18px;border-radius:var(--radius-sm);transform:translateY(80px);opacity:0;transition:all 0.3s;pointer-events:none;}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast.success{background:var(--green);}
+.toast.error{background:var(--red);}
+
+/* DIVIDER */
+.section-divider{height:1px;background:var(--border);margin:24px 0;}
+
+@media print {
+  .header,.run-bar,.setup-panel,.report-print-bar,.btn{display:none!important;}
+  .results-section{display:block!important;}
+  body{background:white;}
+  .report-wrap{border:none;box-shadow:none;}
+}
+@media(max-width:700px){
+  .setup-body,.report-body,.pontos-grid,.ranking-cats{grid-template-columns:1fr;}
+  .header,.main{padding-left:16px;padding-right:16px;}
+}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div>
+    <div class="header-logo">PAULO FRANÇA</div>
+    <div class="header-badge">Motor de Compatibilidade</div>
+  </div>
+  <div class="header-right">
+    <button class="btn ghost" onclick="window.print()">
+      <svg class="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2z"/></svg>
+      Imprimir relatório
+    </button>
+  </div>
+</header>
+
+<div class="main">
+
+  <!-- SETUP -->
+  <div class="setup-panel">
+    <div class="setup-header">
+      <div>
+        <div class="setup-title">Configurar Análise</div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn" onclick="importarPerfil()">
+          <svg class="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+          Importar perfil (JSON)
+        </button>
+        <button class="btn primary" id="btn-run" onclick="rodarMotor()" disabled>
+          <svg class="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+          Gerar Relatório de Compatibilidade
+        </button>
+      </div>
+    </div>
+    <div class="setup-body">
+
+      <!-- COLUNA CLIENTE -->
+      <div class="setup-col">
+        <div class="setup-col-title">Cliente</div>
+        <div id="cliente-card">
+          <div class="cliente-empty">
+            <div class="cliente-empty-icon">👤</div>
+            <div class="cliente-empty-text">Nenhum perfil carregado.<br>Importe o JSON do cliente ou abra o Motor direto após o Mapa de Pesos.</div>
+            <button class="btn" style="margin-top:12px;" onclick="importarPerfil()">Importar perfil</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- COLUNA IMÓVEIS -->
+      <div class="setup-col">
+        <div class="setup-col-title">Imóveis a comparar <span id="imoveis-count" style="color:var(--text-soft);font-weight:300;">(0 selecionados)</span></div>
+        <div id="imoveis-list-container">
+          <div class="empty-imoveis">Nenhum imóvel cadastrado no banco.<br>Cadastre empreendimentos primeiro.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- RUN BAR -->
+  <div class="run-bar">
+    <div class="run-status" id="run-status">Carregue um perfil de cliente e selecione os imóveis para iniciar.</div>
+    <div style="display:flex;gap:8px;">
+      <button class="btn" onclick="limparTudo()">Limpar</button>
+      <button class="btn primary" id="btn-run-2" onclick="rodarMotor()" disabled>
+        <svg class="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+        Gerar Relatório
+      </button>
+    </div>
+  </div>
+
+  <!-- RESULTS -->
+  <div class="results-section" id="results-section">
+
+    <!-- RANKING CARDS -->
+    <div style="margin-bottom:8px;">
+      <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--dark);margin-bottom:4px;" id="results-title">Ranking de Compatibilidade</div>
+      <div style="font-size:13px;color:var(--text-mid);" id="results-sub"></div>
+    </div>
+    <div class="ranking-grid" id="ranking-grid"></div>
+
+    <div class="section-divider"></div>
+
+    <!-- DETAILED REPORTS -->
+    <div id="detailed-reports"></div>
+
+  </div>
+</div>
+
+<input type="file" id="import-input" accept=".json" style="display:none" onchange="handleImport(this)">
+<div class="toast" id="toast"></div>
+
+<script>
+// ══ CONFIG ══
+const DB_KEY = 'pf_empreendimentos_v1';
+const PERFIL_KEY = 'pf_perfil_cliente';
+
+const SCORE_CATS = ['Localização','Imóvel','Segurança','Lazer','Financeiro','Perfil','Serviços'];
+const SCORES = [
+  {id:'sc_loc1',cat:'Localização', label:'Perfil e reputação do bairro'},
+  {id:'sc_loc2',cat:'Localização', label:'Proximidade a trabalho, escola ou família'},
+  {id:'sc_loc3',cat:'Localização', label:'Mobilidade urbana e acesso viário'},
+  {id:'sc_loc4',cat:'Localização', label:'Comércio, gastronomia e serviços a pé'},
+  {id:'sc_imo1',cat:'Imóvel',      label:'Metragem e número de suítes'},
+  {id:'sc_imo2',cat:'Imóvel',      label:'Funcionalidade da planta'},
+  {id:'sc_imo3',cat:'Imóvel',      label:'Luminosidade e posição solar'},
+  {id:'sc_imo4',cat:'Imóvel',      label:'Vista e andar'},
+  {id:'sc_seg1',cat:'Segurança',   label:'Padrão de segurança do condomínio'},
+  {id:'sc_seg2',cat:'Segurança',   label:'Infraestrutura técnica do prédio'},
+  {id:'sc_seg3',cat:'Segurança',   label:'Chegada e privacidade na entrada'},
+  {id:'sc_laz1',cat:'Lazer',       label:'Espaços fitness e bem-estar'},
+  {id:'sc_laz2',cat:'Lazer',       label:'Espaços de convivência e coworking'},
+  {id:'sc_laz3',cat:'Lazer',       label:'Estrutura pet-friendly'},
+  {id:'sc_laz4',cat:'Lazer',       label:'Áreas verdes e contato com a natureza'},
+  {id:'sc_fin1',cat:'Financeiro',  label:'Aderência ao orçamento'},
+  {id:'sc_fin2',cat:'Financeiro',  label:'Potencial de valorização'},
+  {id:'sc_fin3',cat:'Financeiro',  label:'Liquidez de revenda'},
+  {id:'sc_fin4',cat:'Financeiro',  label:'Geração de renda por locação'},
+  {id:'sc_per1',cat:'Perfil',      label:'Afinidade com o DNA da construtora'},
+  {id:'sc_per2',cat:'Perfil',      label:'Padrão construtivo e acabamentos'},
+  {id:'sc_per3',cat:'Perfil',      label:'Arquitetura e assinatura do projeto'},
+  {id:'sc_per4',cat:'Perfil',      label:'Sustentabilidade, eficiência e tecnologia'},
+  {id:'sc_srv1',cat:'Serviços',    label:'Wellness'},
+  {id:'sc_srv2',cat:'Serviços',    label:'Longevity Living'},
+  {id:'sc_srv3',cat:'Serviços',    label:'Branded Residences'},
+  {id:'sc_srv4',cat:'Serviços',    label:'Hospitality Services'},
+];
+
+// ══ STATE ══
+let perfil = null;       // perfil completo do cliente
+let dbImoveis = [];      // banco de empreendimentos
+let selecionados = [];   // IDs selecionados para comparar
+
+// ══ INIT ══
+function init() {
+  loadDB();
+  // Tenta carregar perfil do localStorage (veio direto do Mapa de Pesos)
+  try {
+    const salvo = localStorage.getItem(PERFIL_KEY);
+    const etapa = localStorage.getItem('pf_perfil_etapa');
+    if (salvo) {
+      const p = JSON.parse(salvo);
+      // Só carrega automaticamente se for perfil completo (tem pesos)
+      if (p.pesos && Object.keys(p.pesos).length > 0) {
+        perfil = p;
+        renderClienteCard();
+        showToast('Perfil de ' + (perfil.nome||'cliente') + ' carregado automaticamente.', 'success');
+      }
+    }
+  } catch(e) {}
+  renderImoveisList();
+  updateRunBtn();
+}
+
+function loadDB() {
+  try { dbImoveis = JSON.parse(localStorage.getItem(DB_KEY) || '[]'); }
+  catch(e) { dbImoveis = []; }
+}
+
+// ══ PERFIL ══
+function importarPerfil() {
+  document.getElementById('import-input').click();
+}
+
+function handleImport(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const p = JSON.parse(e.target.result);
+      if (!p.nome) throw new Error('JSON inválido');
+      perfil = p;
+      // Salva no localStorage para sessão atual
+      localStorage.setItem(PERFIL_KEY, JSON.stringify(perfil));
+      renderClienteCard();
+      updateRunBtn();
+      showToast('Perfil de ' + perfil.nome + ' carregado.', 'success');
+    } catch(err) {
+      showToast('Arquivo inválido. Importe um perfil gerado pela Anamnese ou Mapa de Pesos.', 'error');
+    }
+    input.value = '';
+  };
+  reader.readAsText(file);
+}
+
+function renderClienteCard() {
+  if (!perfil) return;
+  const temPesos = perfil.pesos && Object.values(perfil.pesos).some(v => v != null);
+  const nPesos = temPesos ? Object.values(perfil.pesos).filter(v=>v!=null).length : 0;
+  const card = document.getElementById('cliente-card');
+  card.innerHTML = `
+    <div class="cliente-card loaded">
+      <div class="cliente-badge">${temPesos ? '✓ Perfil completo' : '⚠ Sem pesos — importe o Mapa de Preferências'}</div>
+      <div class="cliente-name">${esc(perfil.nome || '—')}</div>
+      <div class="cliente-meta">
+        ${perfil.email ? esc(perfil.email) + '<br>' : ''}
+        ${perfil.p2_faixa ? 'Faixa: ' + esc(perfil.p2_faixa) + '<br>' : ''}
+        ${perfil.p2_finalidade ? 'Finalidade: ' + esc(perfil.p2_finalidade) + '<br>' : ''}
+        ${perfil.p5_horizonte ? 'Horizonte: ' + esc(perfil.p5_horizonte) + '<br>' : ''}
+        ${perfil.p3_bairros && perfil.p3_bairros !== '—' ? 'Bairros: ' + esc(perfil.p3_bairros) : ''}
+      </div>
+      ${temPesos ? `<div style="margin-top:10px;font-size:11px;color:var(--green);">✓ ${nPesos}/27 critérios com peso definido</div>` : ''}
+    </div>`;
+}
+
+// ══ IMÓVEIS ══
+function renderImoveisList() {
+  const el = document.getElementById('imoveis-list-container');
+  if (!dbImoveis.length) {
+    el.innerHTML = '<div class="empty-imoveis">Nenhum imóvel no banco.<br>Cadastre empreendimentos primeiro.</div>';
+    return;
+  }
+  const disponiveis = dbImoveis.filter(x => x.status !== 'Vendido');
+  el.innerHTML = '<div class="imoveis-list">' + disponiveis.map(x => `
+    <div class="imovel-check-item${selecionados.includes(x.id)?' selected':''}" onclick="toggleImovel('${x.id}')">
+      <div class="imovel-chk"></div>
+      <div class="imovel-info">
+        <div class="imovel-info-nome">${esc(x.nome)}</div>
+        <div class="imovel-info-sub">${esc(x.bairro||'')}${x.estagio?' · '+esc(x.estagio):''}</div>
+      </div>
+      <div class="imovel-valor">${x.valor?'R$ '+esc(x.valor):''}</div>
+    </div>`).join('') + '</div>';
+}
+
+function toggleImovel(id) {
+  if (selecionados.includes(id)) {
+    selecionados = selecionados.filter(x => x !== id);
+  } else {
+    selecionados.push(id);
+  }
+  document.getElementById('imoveis-count').textContent = `(${selecionados.length} selecionado${selecionados.length!==1?'s':''})`;
+  renderImoveisList();
+  updateRunBtn();
+}
+
+function updateRunBtn() {
+  const ok = perfil && selecionados.length > 0;
+  const hasPesos = perfil && perfil.pesos && Object.values(perfil.pesos).some(v=>v!=null);
+  ['btn-run','btn-run-2'].forEach(id => {
+    const el = document.getElementById(id);
+    el.disabled = !ok;
+  });
+  const status = document.getElementById('run-status');
+  if (!perfil) status.textContent = 'Carregue um perfil de cliente para iniciar.';
+  else if (!hasPesos) status.innerHTML = '<span style="color:var(--amber)">⚠ Perfil sem pesos — o relatório usará pesos iguais para todos os critérios.</span>';
+  else if (!selecionados.length) status.textContent = 'Selecione ao menos um imóvel para comparar.';
+  else status.innerHTML = `<strong>${selecionados.length}</strong> imóvel${selecionados.length!==1?'is':''} selecionado${selecionados.length!==1?'s':''}. Pronto para gerar o relatório.`;
+}
+
+// ══ MOTOR DE COMPATIBILIDADE ══
+function calcularCompatibilidade(imovel) {
+  const sc = imovel.scores || {};
+  const pesos = (perfil && perfil.pesos) || {};
+
+  let totalPonderado = 0;
+  let totalPeso = 0;
+  const detalhes = {};
+  const catScores = {};
+
+  SCORES.forEach(s => {
+    const scoreImovel = (sc[s.id] != null) ? sc[s.id] : 5;   // 1-10, default 5
+    const pesoCliente = (pesos[s.id] != null) ? pesos[s.id] : 3; // 1-5, default 3
+
+    // Normaliza: score/10 × peso/5 → 0-1
+    const sinergia = (scoreImovel / 10) * (pesoCliente / 5);
+
+    totalPonderado += sinergia * pesoCliente; // pondera mais os critérios mais importantes
+    totalPeso += pesoCliente;
+
+    detalhes[s.id] = {
+      label: s.label,
+      cat: s.cat,
+      scoreImovel,
+      pesoCliente,
+      sinergia: Math.round(sinergia * 100),
+    };
+
+    if (!catScores[s.cat]) catScores[s.cat] = { total: 0, peso: 0, count: 0 };
+    catScores[s.cat].total += sinergia * pesoCliente;
+    catScores[s.cat].peso += pesoCliente;
+    catScores[s.cat].count++;
+  });
+
+  // Score global 0-100
+  const scoreGlobal = totalPeso > 0
+    ? Math.round((totalPonderado / totalPeso) * 100)
+    : 50;
+
+  // Score por categoria 0-100
+  const catResultados = {};
+  SCORE_CATS.forEach(cat => {
+    const d = catScores[cat];
+    catResultados[cat] = d && d.peso > 0
+      ? Math.round((d.total / d.peso) * 100)
+      : 50;
+  });
+
+  // Top sinergias e divergências
+  const listaDetalhes = Object.values(detalhes).sort((a,b) => b.sinergia - a.sinergia);
+  const topFortes = listaDetalhes.slice(0, 5);
+  const topAtencao = [...listaDetalhes].sort((a,b) => a.sinergia - b.sinergia).slice(0, 4);
+
+  return { scoreGlobal, catResultados, detalhes, topFortes, topAtencao };
+}
+
+function rodarMotor() {
+  if (!perfil || !selecionados.length) return;
+
+  const resultados = selecionados.map(id => {
+    const imovel = dbImoveis.find(x => x.id === id);
+    if (!imovel) return null;
+    const compat = calcularCompatibilidade(imovel);
+    return { imovel, ...compat };
+  }).filter(Boolean).sort((a,b) => b.scoreGlobal - a.scoreGlobal);
+
+  renderResultados(resultados);
+  document.getElementById('results-section').classList.add('show');
+  document.getElementById('results-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ══ RENDER RESULTADOS ══
+function scoreColor(n) {
+  if (n >= 70) return 'var(--green)';
+  if (n >= 45) return 'var(--teal)';
+  return 'var(--amber)';
+}
+
+const MEDALS = ['🥇','🥈','🥉',''];
+
+function renderResultados(resultados) {
+  // Title
+  document.getElementById('results-title').textContent = 'Ranking de Compatibilidade';
+  document.getElementById('results-sub').textContent =
+    `${resultados.length} imóvel${resultados.length!==1?'is':''} analisado${resultados.length!==1?'s':''} para ${perfil.nome} · ${new Date().toLocaleDateString('pt-BR')}`;
+
+  // Ranking cards
+  document.getElementById('ranking-grid').innerHTML = resultados.map((r, i) => {
+    const cor = scoreColor(r.scoreGlobal);
+    const cats = SCORE_CATS.map(cat => {
+      const v = r.catResultados[cat];
+      return `<div class="ranking-cat-row">
+        <span class="ranking-cat-label" title="${cat}">${cat}</span>
+        <div class="ranking-cat-bar"><div class="ranking-cat-fill" style="width:${v}%;background:${scoreColor(v)}"></div></div>
+        <span class="ranking-cat-val" style="color:${scoreColor(v)}">${v}</span>
+      </div>`;
+    }).join('');
+    return `<div class="ranking-card${i===0?' rank-1':''}" onclick="scrollToReport('report-${r.imovel.id}')">
+      <div class="ranking-medal">${MEDALS[i]||''}</div>
+      <div class="ranking-nome">${esc(r.imovel.nome)}</div>
+      <div class="ranking-sub">${esc(r.imovel.bairro||'')}${r.imovel.estagio?' · '+esc(r.imovel.estagio):''}</div>
+      <div class="ranking-score-wrap">
+        <div>
+          <div class="ranking-score-num" style="color:${cor}">${r.scoreGlobal}</div>
+          <div style="font-size:10px;color:var(--text-soft);margin-top:2px;">pontos / 100</div>
+        </div>
+        <div class="ranking-score-bar-track" style="flex:1">
+          <div class="ranking-score-bar-fill" style="width:${r.scoreGlobal}%;background:${cor}"></div>
+        </div>
+      </div>
+      <div class="ranking-cats">${cats}</div>
+    </div>`;
+  }).join('');
+
+  // Detailed reports
+  document.getElementById('detailed-reports').innerHTML = resultados.map((r, i) =>
+    buildDetailReport(r, i)
+  ).join('');
+}
+
+function buildDetailReport(r, rank) {
+  const x = r.imovel;
+  const cor = scoreColor(r.scoreGlobal);
+
+  // Sinergias por critério — top 8 mais relevantes (alto peso × alto score)
+  const detList = Object.values(r.detalhes)
+    .filter(d => d.pesoCliente >= 3)
+    .sort((a,b) => b.sinergia - a.sinergia);
+
+  const sinergiaRows = detList.slice(0, 10).map(d => {
+    const c = scoreColor(d.sinergia);
+    return `<div class="sinergia-row">
+      <span class="sinergia-label">${esc(d.label)}</span>
+      <div class="sinergia-bar-wrap">
+        <div class="sinergia-track"><div class="sinergia-fill" style="width:${d.sinergia}%;background:${c}"></div></div>
+        <span class="sinergia-val" style="color:${c}">${d.sinergia}%</span>
+      </div>
+      <span class="sinergia-peso" title="Peso do cliente">${'★'.repeat(d.pesoCliente)}${'☆'.repeat(5-d.pesoCliente)}</span>
+    </div>`;
+  }).join('');
+
+  // Pontos fortes e atenção
+  const fortes = r.topFortes.filter(d => d.sinergia >= 60);
+  const atencao = r.topAtencao.filter(d => d.sinergia < 50 && d.pesoCliente >= 3);
+
+  const pontosHTML = `
+    <div class="pontos-grid">
+      <div>
+        <div class="report-section-title" style="color:var(--green);border-bottom-color:#86EFAC;">Alta sinergia</div>
+        ${fortes.length ? fortes.map(d => `
+          <div class="ponto-card forte" style="margin-bottom:8px;">
+            <div class="ponto-card-label">✓ ${esc(d.cat)}</div>
+            <div class="ponto-card-text">${esc(d.label)}</div>
+          </div>`).join('') : '<div style="font-size:12px;color:var(--text-soft);padding:8px 0;">Nenhum critério com alta sinergia identificado.</div>'}
+      </div>
+      <div>
+        <div class="report-section-title" style="color:var(--amber);border-bottom-color:#FCD34D;">Pontos de atenção</div>
+        ${atencao.length ? atencao.map(d => `
+          <div class="ponto-card atencao" style="margin-bottom:8px;">
+            <div class="ponto-card-label">⚠ ${esc(d.cat)}</div>
+            <div class="ponto-card-text">${esc(d.label)}</div>
+          </div>`).join('') : '<div style="font-size:12px;color:var(--text-soft);padding:8px 0;">Nenhuma divergência significativa identificada.</div>'}
+      </div>
+    </div>`;
+
+  // Alinhamento de perfil qualitativo
+  const alinham = [];
+  const divergem = [];
+  if (perfil.p3_bairros && perfil.p3_bairros !== '—' && x.bairro && perfil.p3_bairros.includes(x.bairro))
+    alinham.push('Bairro está na lista de preferência do cliente');
+  if (perfil.p2_faixa && x.faixas && x.faixas.includes(perfil.p2_faixa))
+    alinham.push('Faixa de investimento compatível');
+  if (perfil.p2_finalidade && x.finalidade && x.finalidade.some(f => perfil.p2_finalidade.includes(f.split(' ')[0])))
+    alinham.push('Finalidade alinhada com objetivo do cliente');
+  if (perfil.p5_horizonte && x.horizonte && x.horizonte.includes(perfil.p5_horizonte))
+    alinham.push('Horizonte de permanência compatível');
+  if (perfil.p3_bairros && perfil.p3_bairros !== '—' && x.bairro && !perfil.p3_bairros.includes(x.bairro))
+    divergem.push('Bairro fora da preferência declarada');
+
+  // Narrativa consultiva
+  const narrativa = x.proposta
+    ? `"${x.proposta}"${x.pontos_fortes ? ' ' + x.pontos_fortes : ''}`
+    : `${x.nome} — ${x.bairro||''} · Score de compatibilidade ${r.scoreGlobal}/100 para o perfil de ${perfil.nome}.`;
+
+  // Categorias resumo
+  const catBars = SCORE_CATS.map(cat => {
+    const v = r.catResultados[cat];
+    const c = scoreColor(v);
+    return `<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+      <div style="font-size:12px;color:var(--text-mid);width:90px;flex-shrink:0;">${cat}</div>
+      <div style="flex:1;height:6px;background:var(--border);border-radius:50px;overflow:hidden;">
+        <div style="height:100%;width:${v}%;background:${c};border-radius:50px;"></div>
+      </div>
+      <div style="font-size:12px;font-weight:600;color:${c};min-width:36px;text-align:right;">${v}/100</div>
+    </div>`;
+  }).join('');
+
+  return `
+  <div class="report-wrap" id="report-${x.id}">
+    <div class="report-header">
+      <div>
+        <div style="font-size:10px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:var(--teal);margin-bottom:6px;">${MEDALS[rank]||'#'+(rank+1)} ${rank===0?'Melhor compatibilidade':rank===1?'Segunda opção':'Terceira opção'}</div>
+        <div class="report-title">${esc(x.nome)}</div>
+        <div class="report-sub">${[x.construtora,x.bairro,x.estagio,x.valor?'R$ '+x.valor:''].filter(Boolean).join(' · ')}</div>
+      </div>
+      <div class="report-score-badge">
+        <div class="report-score-num" style="color:${cor}">${r.scoreGlobal}</div>
+        <div class="report-score-label">compatibilidade</div>
+      </div>
+    </div>
+
+    <div class="report-body">
+      <div>
+        <div class="report-section-title">Sinergia por critério prioritário</div>
+        <div style="font-size:11px;color:var(--text-soft);margin-bottom:12px;">Critérios com peso ≥ 3 do cliente — ordenados por compatibilidade</div>
+        <div class="sinergia-list">${sinergiaRows}</div>
+      </div>
+      <div>
+        <div class="report-section-title">Score por categoria</div>
+        <div style="margin-bottom:20px;">${catBars}</div>
+
+        <div class="report-section-title">Perfil do cliente</div>
+        <div class="perfil-summary">
+          ${pRow('Motivação',perfil.p1_motivacao)}
+          ${pRow('Finalidade',perfil.p2_finalidade)}
+          ${pRow('Faixa',perfil.p2_faixa)}
+          ${pRow('Horizonte',perfil.p5_horizonte)}
+          ${pRow('Moradores',perfil.p3_moradores)}
+          ${pRow('Bairros',perfil.p3_bairros)}
+        </div>
+      </div>
+
+      <div style="grid-column:1/-1;">
+        <div class="report-section-title">Análise de pontos</div>
+        ${pontosHTML}
+      </div>
+
+      ${alinham.length || divergem.length ? `
+      <div style="grid-column:1/-1;">
+        <div class="report-section-title">Alinhamento qualitativo</div>
+        <div style="display:flex;gap:16px;flex-wrap:wrap;">
+          ${alinham.map(a=>`<div style="font-size:12px;color:var(--green);display:flex;gap:6px;align-items:center;"><span>✓</span>${esc(a)}</div>`).join('')}
+          ${divergem.map(d=>`<div style="font-size:12px;color:var(--amber);display:flex;gap:6px;align-items:center;"><span>⚠</span>${esc(d)}</div>`).join('')}
+        </div>
+      </div>` : ''}
+
+      <div style="grid-column:1/-1;">
+        <div class="report-section-title">Narrativa para a call</div>
+        <div class="narrativa-box">${esc(narrativa)}</div>
+        ${x.atencao?`<div style="margin-top:8px;font-size:12px;color:var(--amber);padding:10px 14px;background:var(--amber-light);border-radius:var(--radius-sm);">⚠ ${esc(x.atencao)}</div>`:''}
+      </div>
+    </div>
+
+    <div class="report-print-bar">
+      <button class="btn" onclick="scrollToTop()">↑ Voltar ao ranking</button>
+    </div>
+  </div>`;
+}
+
+function pRow(label, value) {
+  if (!value || value === '—') return '';
+  return `<div class="perfil-row"><span class="perfil-label">${esc(label)}</span><span class="perfil-value">${esc(value)}</span></div>`;
+}
+
+function scrollToReport(id) {
+  const el = document.getElementById(id);
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+function scrollToTop() {
+  document.getElementById('results-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+function limparTudo() {
+  perfil = null;
+  selecionados = [];
+  document.getElementById('results-section').classList.remove('show');
+  document.getElementById('cliente-card').innerHTML = `<div class="cliente-empty"><div class="cliente-empty-icon">👤</div><div class="cliente-empty-text">Nenhum perfil carregado.</div><button class="btn" style="margin-top:12px;" onclick="importarPerfil()">Importar perfil</button></div>`;
+  document.getElementById('imoveis-count').textContent = '(0 selecionados)';
+  renderImoveisList();
+  updateRunBtn();
+}
+
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function showToast(msg, type='') {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.className = 'toast'+(type?' '+type:'');
+  el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'), 3500);
+}
+
+init();
+</script>
+</body>
+</html>

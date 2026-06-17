@@ -1,0 +1,1226 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Banco de Empreendimentos — Paulo França</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+:root {
+  --teal:#0891B2;--teal-dark:#0E7490;--teal-light:#E0F7FA;--teal-mid:#BAE6FD;
+  --gold:#C4933F;--gold-light:#FEF3C7;
+  --dark:#0C1B2E;--text:#1E293B;--text-mid:#475569;--text-soft:#94A3B8;
+  --bg:#F8FAFC;--white:#FFFFFF;--border:#E2E8F0;--border-mid:#CBD5E1;
+  --green:#16A34A;--green-light:#DCFCE7;
+  --red:#DC2626;--red-light:#FEE2E2;
+  --radius:12px;--radius-sm:8px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+
+/* HEADER */
+.header{background:var(--dark);padding:0 32px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;border-bottom:1px solid rgba(255,255,255,0.08);}
+.header-logo{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:0.12em;color:white;}
+.header-badge{font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);}
+.header-right{display:flex;align-items:center;gap:12px;}
+.header-count{font-size:12px;color:rgba(255,255,255,0.45);}
+.header-count strong{color:rgba(255,255,255,0.85);}
+
+/* TABS */
+.tabs-bar{background:white;border-bottom:1px solid var(--border);padding:0 32px;display:flex;gap:4px;overflow-x:auto;}
+.tab-btn{font-family:'DM Sans',sans-serif;font-size:13px;font-weight:400;color:var(--text-soft);background:none;border:none;cursor:pointer;padding:14px 16px;border-bottom:2px solid transparent;white-space:nowrap;transition:all 0.2s;}
+.tab-btn:hover{color:var(--text);}
+.tab-btn.active{color:var(--teal);border-bottom-color:var(--teal);font-weight:500;}
+
+/* VIEWS */
+.view{display:none;}.view.active{display:block;}
+
+/* DASHBOARD */
+.dash-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;padding:24px 32px;}
+.stat-card{background:white;border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px;}
+.stat-label{font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-soft);margin-bottom:6px;}
+.stat-value{font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:var(--dark);}
+.stat-sub{font-size:12px;color:var(--text-mid);margin-top:4px;}
+.dash-table-wrap{padding:0 32px 32px;}
+.dash-section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.dash-table-title{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--dark);}
+
+/* TABLE */
+.empr-table-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:var(--radius);background:white;}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+thead th{background:var(--bg);padding:10px 14px;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-soft);font-weight:500;border-bottom:1px solid var(--border);white-space:nowrap;user-select:none;}
+thead th.sortable{cursor:pointer;}
+thead th.sortable:hover{color:var(--teal);}
+thead th.sort-asc::after{content:' ↑';color:var(--teal);}
+thead th.sort-desc::after{content:' ↓';color:var(--teal);}
+tbody tr{border-bottom:1px solid var(--border);transition:background 0.15s;}
+tbody tr:last-child{border-bottom:none;}
+tbody tr:hover{background:var(--bg);}
+td{padding:11px 14px;color:var(--text);vertical-align:middle;}
+td.td-nome{font-weight:500;color:var(--dark);max-width:220px;}
+td.td-nome small{display:block;font-size:11px;font-weight:300;color:var(--text-soft);margin-top:2px;}
+
+/* BADGES */
+.badge{display:inline-block;font-size:10px;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;padding:3px 8px;border-radius:50px;}
+.badge-teal{background:var(--teal-light);color:var(--teal-dark);}
+.badge-gold{background:var(--gold-light);color:#92600A;}
+.badge-green{background:var(--green-light);color:var(--green);}
+.badge-gray{background:var(--bg);color:var(--text-soft);border:1px solid var(--border);}
+.badge-red{background:var(--red-light);color:var(--red);}
+
+/* TAGS */
+.tag-list{display:flex;gap:4px;flex-wrap:wrap;}
+.tag{font-size:10px;padding:2px 7px;border-radius:50px;background:var(--teal-light);color:var(--teal-dark);}
+
+/* BUTTONS */
+.btn-action{display:inline-flex;align-items:center;gap:5px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;padding:6px 12px;border-radius:var(--radius-sm);cursor:pointer;border:1px solid var(--border);background:white;color:var(--text);transition:all 0.15s;white-space:nowrap;}
+.btn-action:hover{background:var(--bg);border-color:var(--border-mid);}
+.btn-action.primary{background:var(--teal);color:white;border-color:var(--teal);}
+.btn-action.primary:hover{background:var(--teal-dark);border-color:var(--teal-dark);}
+.btn-action.danger{color:var(--red);border-color:#FECACA;}
+.btn-action.danger:hover{background:var(--red-light);}
+.btn-action.ghost{background:transparent;border-color:rgba(255,255,255,0.2);color:rgba(255,255,255,0.7);}
+.btn-action.ghost:hover{background:rgba(255,255,255,0.08);color:white;}
+.btn-icon{width:14px;height:14px;flex-shrink:0;}
+
+/* FILTERS BAR */
+.filters-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:14px 32px;border-bottom:1px solid var(--border);background:white;}
+.filter-input{font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:7px 12px;outline:none;transition:border 0.15s;min-width:170px;}
+.filter-input:focus{border-color:var(--teal);background:white;}
+.filter-input::placeholder{color:var(--text-soft);}
+select.filter-input{cursor:pointer;}
+.filter-label{font-size:12px;color:var(--text-soft);white-space:nowrap;}
+.filters-bar-right{margin-left:auto;display:flex;align-items:center;gap:8px;}
+.filter-count-badge{font-size:12px;color:var(--text-soft);}
+
+/* FORM */
+.form-wrap{max-width:860px;margin:0 auto;padding:28px 24px 100px;}
+.form-section{background:white;border:1px solid var(--border);border-radius:var(--radius);padding:28px 32px;margin-bottom:16px;}
+.form-section-title{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--dark);margin-bottom:4px;}
+.form-section-sub{font-size:13px;color:var(--text-mid);margin-bottom:22px;}
+.form-eyebrow{font-size:10px;font-weight:500;letter-spacing:0.18em;text-transform:uppercase;color:var(--teal);margin-bottom:8px;}
+.field-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.field-full{grid-column:1/-1;}
+.field{display:flex;flex-direction:column;gap:6px;}
+.field label{font-size:13px;font-weight:500;color:var(--dark);}
+.field label .req{color:var(--teal);margin-left:2px;}
+.field .hint{font-size:11px;color:var(--text-soft);margin-top:-2px;}
+.field input,.field select,.field textarea{font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:9px 12px;outline:none;transition:border 0.15s;width:100%;}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--teal);background:white;}
+.field input::placeholder,.field textarea::placeholder{color:var(--text-soft);}
+.field textarea{resize:vertical;min-height:82px;}
+.field select{cursor:pointer;}
+.pfx-wrap{position:relative;}
+.pfx-wrap input{padding-left:36px;}
+.pfx{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:13px;color:var(--text-soft);pointer-events:none;}
+
+/* CHECK GRID */
+.check-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(195px,1fr));gap:8px;}
+.check-option{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;transition:all 0.15s;user-select:none;}
+.check-option:hover{border-color:var(--teal);background:var(--teal-light);}
+.check-option input{display:none;}
+.chk-box{width:16px;height:16px;border:2px solid var(--border-mid);border-radius:4px;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all 0.15s;}
+.check-option input:checked~.chk-box{background:var(--teal);border-color:var(--teal);}
+.check-option input:checked~.chk-box::after{content:'';width:8px;height:5px;border-left:2px solid white;border-bottom:2px solid white;transform:rotate(-45deg) translateY(-1px);display:block;}
+.check-option input:checked~.chk-label{color:var(--teal-dark);font-weight:500;}
+.chk-label{font-size:13px;color:var(--text-mid);line-height:1.4;}
+.check-counter{font-size:11px;color:var(--text-soft);margin-bottom:10px;}
+.check-counter span{color:var(--teal);font-weight:500;}
+
+/* SCORES */
+.score-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.score-item{display:flex;flex-direction:column;gap:7px;}
+.score-item-header{display:flex;justify-content:space-between;align-items:center;}
+.score-item-label{font-size:13px;font-weight:500;color:var(--dark);}
+.score-item-val{font-size:16px;font-weight:700;color:var(--teal);min-width:24px;text-align:right;}
+.score-bar-track{height:5px;background:var(--border);border-radius:50px;overflow:hidden;}
+.score-bar-fill{height:100%;background:linear-gradient(90deg,var(--teal),var(--teal-dark));border-radius:50px;transition:width 0.25s;}
+.score-item input[type=range]{width:100%;accent-color:var(--teal);cursor:pointer;}
+
+/* SCORE CATEGORIES */
+.score-cat-block { margin-bottom: 24px; }
+.score-cat-block:last-child { margin-bottom: 0; }
+.score-cat-title {
+  font-size: 11px; font-weight: 500; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--teal);
+  padding-bottom: 10px; margin-bottom: 14px;
+  border-bottom: 1px solid var(--teal-light);
+}
+.score-cat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.score-hint { font-size: 11px; color: var(--text-soft); line-height: 1.5; margin-bottom: 4px; margin-top: -2px; }
+@media(max-width:640px) { .score-cat-grid { grid-template-columns: 1fr; } }
+
+/* FORM ACTIONS */
+.form-actions{display:flex;justify-content:flex-end;gap:10px;padding:18px 32px;background:white;border-top:1px solid var(--border);position:sticky;bottom:0;z-index:10;}
+
+/* DETAIL MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(12,27,46,0.65);z-index:300;display:none;align-items:flex-start;justify-content:center;padding:40px 16px;overflow-y:auto;}
+.modal-overlay.open{display:flex;}
+.modal{background:white;border-radius:var(--radius);width:100%;max-width:760px;box-shadow:0 24px 64px rgba(0,0,0,0.3);animation:slideIn 0.22s ease;flex-shrink:0;}
+@keyframes slideIn{from{opacity:0;transform:translateY(-10px);}to{opacity:1;transform:translateY(0);}}
+.modal-header{padding:24px 28px 18px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;gap:16px;}
+.modal-title{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--dark);}
+.modal-sub{font-size:13px;color:var(--text-mid);margin-top:4px;}
+.modal-close{width:32px;height:32px;border-radius:50%;border:1px solid var(--border);background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-soft);font-size:18px;flex-shrink:0;transition:all 0.15s;}
+.modal-close:hover{background:var(--bg);}
+.modal-tabs{display:flex;gap:0;border-bottom:1px solid var(--border);padding:0 28px;}
+.modal-tab{font-size:13px;padding:11px 16px;border:none;background:none;cursor:pointer;color:var(--text-soft);border-bottom:2px solid transparent;transition:all 0.15s;}
+.modal-tab.active{color:var(--teal);border-bottom-color:var(--teal);font-weight:500;}
+.modal-panel{display:none;padding:22px 28px;}.modal-panel.active{display:block;}
+.modal-2col{display:grid;grid-template-columns:1fr 1fr;gap:0 24px;}
+.modal-section-title{font-size:11px;text-transform:uppercase;letter-spacing:0.12em;color:var(--text-soft);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border);}
+.modal-row{display:flex;justify-content:space-between;align-items:flex-start;padding:7px 0;border-bottom:1px solid var(--border);gap:12px;}
+.modal-row:last-child{border-bottom:none;}
+.modal-row-label{font-size:12px;color:var(--text-soft);white-space:nowrap;}
+.modal-row-value{font-size:13px;color:var(--dark);text-align:right;max-width:60%;}
+.modal-full{grid-column:1/-1;}
+.modal-footer{padding:14px 28px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:10px;}
+.modal-footer-left{display:flex;gap:8px;}
+.modal-footer-right{display:flex;gap:8px;}
+
+/* SCORE DISPLAY in modal */
+.score-display-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+@media(max-width:640px){ .score-display-grid { grid-template-columns: 1fr; } }
+.score-display-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.score-display-item{display:flex;flex-direction:column;gap:5px;}
+.score-display-label{font-size:12px;color:var(--text-mid);}
+.score-display-bar{display:flex;align-items:center;gap:8px;}
+.score-display-track{flex:1;height:5px;background:var(--border);border-radius:50px;overflow:hidden;}
+.score-display-fill{height:100%;background:linear-gradient(90deg,var(--teal),var(--teal-dark));border-radius:50px;}
+.score-display-val{font-size:12px;font-weight:600;color:var(--teal);min-width:20px;}
+
+/* CONFIRM */
+.confirm-overlay{position:fixed;inset:0;background:rgba(12,27,46,0.55);z-index:400;display:none;align-items:center;justify-content:center;padding:16px;}
+.confirm-overlay.open{display:flex;}
+.confirm-box{background:white;border-radius:var(--radius);padding:32px;max-width:380px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,0.25);text-align:center;}
+.confirm-icon{font-size:36px;margin-bottom:12px;}
+.confirm-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--dark);margin-bottom:8px;}
+.confirm-sub{font-size:13px;color:var(--text-mid);margin-bottom:24px;line-height:1.6;}
+.confirm-actions{display:flex;gap:10px;justify-content:center;}
+
+/* EMPTY */
+.empty-state{text-align:center;padding:64px 32px;color:var(--text-soft);}
+.empty-icon{font-size:40px;margin-bottom:12px;opacity:0.5;}
+.empty-title{font-size:16px;font-weight:500;color:var(--text-mid);margin-bottom:6px;}
+.empty-sub{font-size:13px;}
+
+/* IMPORT/EXPORT drawer */
+.io-bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;z-index:600;background:var(--dark);color:white;font-size:13px;padding:12px 18px;border-radius:var(--radius-sm);box-shadow:0 4px 20px rgba(0,0,0,0.2);transform:translateY(80px);opacity:0;transition:all 0.3s;pointer-events:none;max-width:320px;}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast.success{background:var(--green);}
+.toast.error{background:var(--red);}
+
+@media(max-width:640px){
+  .field-grid,.score-grid,.modal-2col,.score-display-grid{grid-template-columns:1fr;}
+  .header,.tabs-bar,.filters-bar,.dash-grid,.dash-table-wrap{padding-left:16px;padding-right:16px;}
+  .form-wrap{padding-left:16px;padding-right:16px;}
+  .modal-panel{padding:16px;}
+  .modal-header{padding:18px 16px 14px;}
+  .modal-footer{flex-direction:column;}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <div>
+    <div class="header-logo">PAULO FRANÇA</div>
+    <div class="header-badge">Banco de Empreendimentos</div>
+  </div>
+  <div class="header-right">
+    <span class="header-count">Total: <strong id="totalCount">0</strong></span>
+    <button class="btn-action ghost" onclick="openImportExport()" title="Importar / Exportar dados">
+      <svg class="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+      Exportar
+    </button>
+    <button class="btn-action primary" onclick="openForm()">
+      <svg class="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+      Novo Empreendimento
+    </button>
+  </div>
+</header>
+
+<!-- TABS -->
+<nav class="tabs-bar">
+  <button class="tab-btn active" onclick="switchTab('dashboard')">Dashboard</button>
+  <button class="tab-btn" onclick="switchTab('lista')">Lista de Imóveis</button>
+</nav>
+
+<!-- ══ DASHBOARD ══ -->
+<div id="view-dashboard" class="view active">
+  <div class="dash-grid">
+    <div class="stat-card"><div class="stat-label">Total</div><div class="stat-value" id="ds-total">0</div><div class="stat-sub">empreendimentos</div></div>
+    <div class="stat-card"><div class="stat-label">Disponíveis</div><div class="stat-value" id="ds-disponiveis">0</div><div class="stat-sub">no portfólio ativo</div></div>
+    <div class="stat-card"><div class="stat-label">Ticket Médio</div><div class="stat-value" id="ds-ticket">—</div><div class="stat-sub">valor médio</div></div>
+    <div class="stat-card"><div class="stat-label">Bairros</div><div class="stat-value" id="ds-bairros">0</div><div class="stat-sub">regiões cobertas</div></div>
+    <div class="stat-card"><div class="stat-label">Lançamentos</div><div class="stat-value" id="ds-lancamentos">0</div><div class="stat-sub">na planta / em obras</div></div>
+    <div class="stat-card"><div class="stat-label">Prontos</div><div class="stat-value" id="ds-prontos">0</div><div class="stat-sub">novo / revenda</div></div>
+  </div>
+  <div class="dash-table-wrap">
+    <div class="dash-section-header">
+      <div class="dash-table-title">Cadastros Recentes</div>
+    </div>
+    <div class="empr-table-wrap" id="dash-table-container">
+      <div class="empty-state"><div class="empty-icon">🏛️</div><div class="empty-title">Nenhum empreendimento cadastrado</div><div class="empty-sub">Clique em "Novo Empreendimento" para começar.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ LISTA ══ -->
+<div id="view-lista" class="view">
+  <div class="filters-bar">
+    <span class="filter-label">Filtros:</span>
+    <input type="text" class="filter-input" id="f-busca" placeholder="Nome, bairro, construtora…" oninput="applyFilters()" style="min-width:220px;">
+    <select class="filter-input" id="f-status" onchange="applyFilters()">
+      <option value="">Todos os status</option>
+      <option>Disponível</option><option>Reservado</option><option>Vendido</option><option>Lançamento</option>
+    </select>
+    <select class="filter-input" id="f-estagio" onchange="applyFilters()">
+      <option value="">Todos os estágios</option>
+      <option>Na planta</option><option>Em obras</option><option>Pronto novo</option><option>Revenda</option>
+    </select>
+    <select class="filter-input" id="f-bairro" onchange="applyFilters()">
+      <option value="">Todos os bairros</option>
+    </select>
+    <select class="filter-input" id="f-faixa" onchange="applyFilters()">
+      <option value="">Todas as faixas</option>
+      <option value="0-500000">Até R$ 500 mil</option>
+      <option value="500000-1000000">R$ 500k – R$ 1M</option>
+      <option value="1000000-2000000">R$ 1M – R$ 2M</option>
+      <option value="2000000-5000000">R$ 2M – R$ 5M</option>
+      <option value="5000000-10000000">R$ 5M – R$ 10M</option>
+      <option value="10000000-999999999">Acima de R$ 10M</option>
+    </select>
+    <div class="filters-bar-right">
+      <button class="btn-action" onclick="clearFilters()">Limpar</button>
+      <span class="filter-count-badge" id="filter-count"></span>
+    </div>
+  </div>
+  <div style="padding:20px 32px 48px;">
+    <div class="empr-table-wrap" id="lista-table-container"></div>
+  </div>
+</div>
+
+<!-- ══ FORM (overlay) ══ -->
+<div id="form-view" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:150;overflow-y:auto;">
+  <div class="header" style="position:sticky;top:0;">
+    <div>
+      <div class="header-logo">PAULO FRANÇA</div>
+      <div class="header-badge" id="form-header-badge">Novo Empreendimento</div>
+    </div>
+    <div class="header-right">
+      <button class="btn-action ghost" onclick="closeForm()">Cancelar</button>
+    </div>
+  </div>
+
+  <div class="form-wrap">
+
+    <!-- S1: Identificação -->
+    <div class="form-section">
+      <div class="form-eyebrow">Nível 1 — Dados Objetivos</div>
+      <div class="form-section-title">Identificação & Localização</div>
+      <div class="form-section-sub">Informações factuais e verificáveis do empreendimento.</div>
+      <div class="field-grid">
+        <div class="field field-full">
+          <label>Nome do Empreendimento <span class="req">*</span></label>
+          <input type="text" id="f_nome" placeholder="Ex: Edifício Boa Vista Residences">
+        </div>
+        <div class="field">
+          <label>Construtora / Incorporadora</label>
+          <input type="text" id="f_construtora" placeholder="Ex: Cyrela, Even…">
+        </div>
+        <div class="field">
+          <label>Status <span class="req">*</span></label>
+          <select id="f_status">
+            <option value="">— Selecione —</option>
+            <option>Disponível</option><option>Reservado</option><option>Vendido</option><option>Lançamento</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Bairro <span class="req">*</span></label>
+          <select id="f_bairro">
+            <option value="">— Selecione —</option>
+            <option>Jardins</option><option>Vila Madalena / Pinheiros</option><option>Itaim Bibi / Vila Olímpia</option>
+            <option>Moema / Brooklin</option><option>Higienópolis</option><option>Perdizes / Pompeia</option>
+            <option>Campo Belo</option><option>Vila Nova Conceição</option><option>Morumbi</option>
+            <option>Alphaville</option><option>Granja Viana</option><option>Outros</option>
+          </select>
+        </div>
+        <div class="field field-full">
+          <label>Endereço completo</label>
+          <input type="text" id="f_endereco" placeholder="Rua, número, complemento">
+        </div>
+        <div class="field field-full">
+          <label>Link de apresentação / tour virtual</label>
+          <div class="hint">URL de book, PDF, vídeo ou tour 360°</div>
+          <input type="url" id="f_link" placeholder="https://…">
+        </div>
+      </div>
+    </div>
+
+    <!-- S2: Características -->
+    <div class="form-section">
+      <div class="form-eyebrow">Nível 1 — Dados Objetivos</div>
+      <div class="form-section-title">Características Físicas</div>
+      <div class="field-grid">
+        <div class="field">
+          <label>Estágio <span class="req">*</span></label>
+          <select id="f_estagio">
+            <option value="">— Selecione —</option>
+            <option>Na planta</option><option>Em obras</option><option>Pronto novo</option><option>Revenda</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Tipologia</label>
+          <select id="f_tipologia">
+            <option value="">— Selecione —</option>
+            <option>Apartamento</option><option>Cobertura</option><option>Penthouse</option>
+            <option>Casa em condomínio</option><option>Casa térrea</option><option>Duplex / Triplex</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Metragem privativa (m²)</label>
+          <input type="number" id="f_area_priv" placeholder="180" min="0">
+        </div>
+        <div class="field">
+          <label>Metragem total (m²)</label>
+          <input type="number" id="f_area_total" placeholder="220" min="0">
+        </div>
+        <div class="field">
+          <label>Suítes</label>
+          <select id="f_suites">
+            <option value="">—</option>
+            <option>1</option><option>2</option><option>3</option><option>4</option><option>5+</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Vagas de garagem</label>
+          <select id="f_vagas">
+            <option value="">—</option>
+            <option>1</option><option>2</option><option>3</option><option>4</option><option>5+</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Andar / Posição</label>
+          <input type="text" id="f_andar" placeholder="Ex: 12°, Cobertura, Térreo…">
+        </div>
+        <div class="field">
+          <label>Vista</label>
+          <input type="text" id="f_vista" placeholder="Ex: Parque, Cidade, Mar…">
+        </div>
+      </div>
+    </div>
+
+    <!-- S3: Financeiro -->
+    <div class="form-section">
+      <div class="form-eyebrow">Nível 1 — Dados Objetivos</div>
+      <div class="form-section-title">Valor & Condições Comerciais</div>
+      <div class="field-grid">
+        <div class="field">
+          <label>Valor (R$) <span class="req">*</span></label>
+          <div class="pfx-wrap"><span class="pfx">R$</span><input type="text" id="f_valor" placeholder="2.500.000" oninput="maskMoney(this)"></div>
+        </div>
+        <div class="field">
+          <label>Condomínio / mês (R$)</label>
+          <div class="pfx-wrap"><span class="pfx">R$</span><input type="text" id="f_condominio" placeholder="4.200" oninput="maskMoney(this)"></div>
+        </div>
+        <div class="field">
+          <label>Margem de negociação</label>
+          <select id="f_margem">
+            <option value="">—</option>
+            <option>Sem margem</option><option>Até 5%</option><option>Até 10%</option><option>Até 15%</option><option>Negociável</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Prazo de entrega</label>
+          <input type="text" id="f_entrega" placeholder="Ex: Dez/2026, Pronto, Imediato">
+        </div>
+        <div class="field">
+          <label>Aceita financiamento?</label>
+          <select id="f_financiamento"><option value="">—</option><option>Sim</option><option>Não</option><option>Parcialmente</option></select>
+        </div>
+        <div class="field">
+          <label>Aceita permuta?</label>
+          <select id="f_permuta"><option value="">—</option><option>Sim</option><option>Não</option><option>Parcialmente</option></select>
+        </div>
+      </div>
+    </div>
+
+    <!-- S4: Diferenciais -->
+    <div class="form-section">
+      <div class="form-eyebrow">Nível 1 — Dados Objetivos</div>
+      <div class="form-section-title">Infraestrutura & Diferenciais</div>
+      <div class="form-section-sub">Selecione todos os itens presentes no empreendimento.</div>
+      <div class="check-counter">Selecionados: <span id="cnt-dif">0</span></div>
+      <div class="check-grid" id="check-diferenciais"></div>
+    </div>
+
+    <!-- S5: Perfil interpretativo -->
+    <div class="form-section">
+      <div class="form-eyebrow">Nível 2 — Dados Interpretativos</div>
+      <div class="form-section-title">Perfil de Cliente Compatível</div>
+      <div class="form-section-sub">Quais motivações e perfis da Anamnese melhor se encaixam neste imóvel?</div>
+
+      <div style="margin-bottom:22px;">
+        <div class="field"><label>Faixa de investimento compatível</label><div class="hint">Liga diretamente com a pergunta q2_2 da Anamnese</div></div>
+        <div class="check-grid" style="margin-top:10px;" id="check-faixas"></div>
+      </div>
+      <div style="margin-bottom:22px;">
+        <div class="field"><label>Motivações mais compatíveis — Pilar I</label></div>
+        <div class="check-grid" style="margin-top:10px;" id="check-motivacoes"></div>
+      </div>
+      <div style="margin-bottom:22px;">
+        <div class="field"><label>Finalidade adequada — Pilar II</label></div>
+        <div class="check-grid" style="margin-top:10px;" id="check-finalidade"></div>
+      </div>
+      <div>
+        <div class="field"><label>Horizonte de permanência compatível — Pilar V</label></div>
+        <div class="check-grid" style="margin-top:10px;" id="check-horizonte"></div>
+      </div>
+    </div>
+
+    <!-- S6: Scores -->
+    <div class="form-section">
+      <div class="form-eyebrow">Nível 2 — Dados Interpretativos</div>
+      <div class="form-section-title">Scores de Compatibilidade</div>
+      <div class="form-section-sub">Avalie de 1 a 10 o alinhamento deste imóvel com cada dimensão.</div>
+      <div id="score-grid"></div>
+    </div>
+
+    <!-- S7: Narrativa -->
+    <div class="form-section">
+      <div class="form-eyebrow">Nível 2 — Dados Interpretativos</div>
+      <div class="form-section-title">Narrativa Consultiva</div>
+      <div class="form-section-sub">Como você apresentaria este imóvel para o cliente certo?</div>
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <div class="field field-full">
+          <label>Proposta de valor em 1 frase</label>
+          <input type="text" id="f_proposta" placeholder="Ex: O único duplex com jardim privativo em Pinheiros com condomínio acessível.">
+        </div>
+        <div class="field field-full">
+          <label>Pontos fortes</label>
+          <textarea id="f_pontos_fortes" placeholder="O que faz este imóvel ser especial para o cliente certo?"></textarea>
+        </div>
+        <div class="field field-full">
+          <label>Pontos de atenção</label>
+          <textarea id="f_atencao" placeholder="O que pode ser um obstáculo para certos perfis?"></textarea>
+        </div>
+        <div class="field field-full">
+          <label>Para quem NÃO indicar</label>
+          <textarea id="f_nao_indicar" placeholder="Perfis que provavelmente não se encaixarão neste imóvel…"></textarea>
+        </div>
+        <div class="field field-full">
+          <label>Observações internas</label>
+          <textarea id="f_obs" placeholder="Notas privadas — histórico, proprietário, urgência de venda, contatos…"></textarea>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /form-wrap -->
+
+  <div class="form-actions">
+    <button class="btn-action" onclick="closeForm()">Cancelar</button>
+    <button class="btn-action primary" onclick="saveEmpreendimento()">
+      <svg class="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+      <span id="save-btn-label">Salvar Empreendimento</span>
+    </button>
+  </div>
+</div><!-- /form-view -->
+
+<!-- ══ DETAIL MODAL ══ -->
+<div class="modal-overlay" id="detail-modal" onclick="closeModal(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title" id="md-nome">—</div>
+        <div class="modal-sub" id="md-sub">—</div>
+      </div>
+      <button class="modal-close" onclick="closeModalBtn()">×</button>
+    </div>
+    <div class="modal-tabs">
+      <button class="modal-tab active" onclick="switchModalTab('objetivo')">Dados do Imóvel</button>
+      <button class="modal-tab" onclick="switchModalTab('curadoria')">Curadoria</button>
+      <button class="modal-tab" onclick="switchModalTab('scores')">Scores</button>
+    </div>
+    <!-- Panel: Objetivo -->
+    <div class="modal-panel active" id="mpanel-objetivo">
+      <div class="modal-2col" id="md-objetivo-content"></div>
+    </div>
+    <!-- Panel: Curadoria -->
+    <div class="modal-panel" id="mpanel-curadoria">
+      <div id="md-curadoria-content"></div>
+    </div>
+    <!-- Panel: Scores -->
+    <div class="modal-panel" id="mpanel-scores">
+      <div id="md-scores-content"></div>
+    </div>
+    <div class="modal-footer">
+      <div class="modal-footer-left">
+        <button class="btn-action danger" id="btn-delete-modal" onclick="confirmDelete()">Excluir</button>
+      </div>
+      <div class="modal-footer-right">
+        <button class="btn-action" onclick="closeModalBtn()">Fechar</button>
+        <button class="btn-action primary" onclick="editFromModal()">Editar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ IMPORT/EXPORT MODAL ══ -->
+<div class="confirm-overlay" id="io-overlay" onclick="if(event.target===this)closeIO()">
+  <div class="confirm-box" style="max-width:500px;text-align:left;">
+    <div class="confirm-title" style="text-align:center;margin-bottom:20px;">Exportar / Importar</div>
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <button class="btn-action primary" style="justify-content:center;" onclick="exportJSON()">
+        ⬇ Exportar banco como JSON
+      </button>
+      <div style="border-top:1px solid var(--border);padding-top:12px;">
+        <div class="field">
+          <label>Importar JSON (substitui dados atuais)</label>
+          <div class="hint" style="color:var(--red)">⚠ Atenção: sobrescreve o banco atual.</div>
+          <input type="file" id="import-file" accept=".json" onchange="importJSON(this)">
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:20px;text-align:center;">
+      <button class="btn-action" onclick="closeIO()">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ CONFIRM DELETE ══ -->
+<div class="confirm-overlay" id="confirm-overlay">
+  <div class="confirm-box">
+    <div class="confirm-icon">⚠️</div>
+    <div class="confirm-title">Excluir empreendimento?</div>
+    <div class="confirm-sub">Esta ação não pode ser desfeita. O imóvel será removido permanentemente do banco de dados.</div>
+    <div class="confirm-actions">
+      <button class="btn-action" onclick="closeConfirm()">Cancelar</button>
+      <button class="btn-action danger" onclick="doDelete()">Sim, excluir</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ══ CONSTANTS ══
+const DB_KEY = 'pf_empreendimentos_v1';
+
+const DIFERENCIAIS = [
+  'Portaria 24h','Concierge','Segurança privada','Vaga coberta','Vaga dupla','Depósito',
+  'Varanda / Sacada','Varanda gourmet','Churrasqueira','Piscina privativa','Piscina coletiva',
+  'Sauna','Academia','Salão de festas','Espaço gourmet coletivo','Cinema / Sala de mídia',
+  'Coworking','Playground','Pet friendly','Garden / Jardim privativo','Rooftop',
+  'Smart Home / Automação','Eficiência energética','Heliponto','Vista livre',
+  'Pronto para morar','Mobiliado','Semimobiliado','Projeto assinado'
+];
+const FAIXAS = [
+  'Até R$ 500.000','R$ 500k – R$ 1M','R$ 1M – R$ 2M',
+  'R$ 2M – R$ 5M','R$ 5M – R$ 10M','Acima de R$ 10M'
+];
+const MOTIVACOES = [
+  'Crescimento da família','Busca por mais espaço','Novo estilo de vida',
+  'Investimento patrimonial','Mudança de cidade','Mudança de emprego','Segurança'
+];
+const FINALIDADES = [
+  'Moradia própria (principal)','Investimento (principal)',
+  'Moradia + Investimento equilibrados','Moradia → Investimento futuro'
+];
+const HORIZONTES = ['Até 3 anos','3–5 anos','5–10 anos','Mais de 10 anos','Indefinido'];
+// 27 critérios — IDs idênticos ao pesos_v1.html para permitir correlação direta
+const SCORES = [
+  // Localização
+  {id:'sc_loc1', cat:'Localização',  label:'Perfil e reputação do bairro',           hint:'O bairro comunica o padrão e posicionamento esperado pelo cliente-alvo?'},
+  {id:'sc_loc2', cat:'Localização',  label:'Proximidade a trabalho, escola ou família', hint:'A localização serve bem o cotidiano típico do perfil deste imóvel?'},
+  {id:'sc_loc3', cat:'Localização',  label:'Mobilidade urbana e acesso viário',       hint:'Vias, transporte público, acesso ao aeroporto — fluidez geral da região.'},
+  {id:'sc_loc4', cat:'Localização',  label:'Comércio, gastronomia e serviços a pé',  hint:'É possível resolver o dia a dia caminhando? Padaria, farmácia, restaurantes próximos.'},
+  // Imóvel
+  {id:'sc_imo1', cat:'Imóvel',       label:'Metragem e número de suítes',             hint:'A configuração de espaço atende bem o perfil de família/morador esperado?'},
+  {id:'sc_imo2', cat:'Imóvel',       label:'Funcionalidade da planta',                hint:'Circulação inteligente, ambientes integrados, aproveitamento real do espaço.'},
+  {id:'sc_imo3', cat:'Imóvel',       label:'Luminosidade e posição solar',            hint:'Orientação solar, ventilação natural, entrada de luz ao longo do dia.'},
+  {id:'sc_imo4', cat:'Imóvel',       label:'Vista e andar',                           hint:'Vista livre, privacidade visual, andar elevado — percepção de amplitude.'},
+  // Segurança
+  {id:'sc_seg1', cat:'Segurança',    label:'Padrão de segurança do condomínio',       hint:'Portaria 24h, controle de acesso, monitoramento, histórico de ocorrências.'},
+  {id:'sc_seg2', cat:'Segurança',    label:'Infraestrutura técnica do prédio',        hint:'Gerador, fibra, automação predial, vagas — a espinha dorsal invisível.'},
+  {id:'sc_seg3', cat:'Segurança',    label:'Chegada e privacidade na entrada',        hint:'Porte-cochère, hall privativo, acesso discreto — a experiência de entrar.'},
+  // Lazer
+  {id:'sc_laz1', cat:'Lazer',        label:'Espaços fitness e bem-estar',             hint:'Academia, piscina, sauna, spa — qualidade e completude dos espaços.'},
+  {id:'sc_laz2', cat:'Lazer',        label:'Espaços de convivência e coworking',      hint:'Salões, espaço gourmet, lounge, coworking — extensão da vida social.'},
+  {id:'sc_laz3', cat:'Lazer',        label:'Estrutura pet-friendly',                  hint:'Pet place, áreas de passeio, permissividade — o condomínio cuida bem de pets?'},
+  {id:'sc_laz4', cat:'Lazer',        label:'Áreas verdes e contato com a natureza',   hint:'Jardins paisagísticos, bosques internos, terraços verdes, hortas.'},
+  // Financeiro
+  {id:'sc_fin1', cat:'Financeiro',   label:'Aderência ao orçamento',                  hint:'O valor total (+ condomínio) cabe confortavelmente na faixa declarada?'},
+  {id:'sc_fin2', cat:'Financeiro',   label:'Potencial de valorização',                hint:'Bairro em ascensão, entorno em desenvolvimento, escassez de produto similar.'},
+  {id:'sc_fin3', cat:'Financeiro',   label:'Liquidez de revenda',                     hint:'Tipologia e localização com mercado ativo — saída fácil se necessário.'},
+  {id:'sc_fin4', cat:'Financeiro',   label:'Geração de renda por locação',            hint:'Potencial de renda passiva — aluguel mensal compatível com o ticket.'},
+  // Perfil do Empreendimento
+  {id:'sc_per1', cat:'Perfil',       label:'Afinidade com o DNA da construtora',      hint:'A assinatura da construtora dialoga com o perfil e gosto do cliente-alvo?'},
+  {id:'sc_per2', cat:'Perfil',       label:'Padrão construtivo e acabamentos',        hint:'Qualidade dos materiais, especificação técnica, marcenaria, revestimentos.'},
+  {id:'sc_per3', cat:'Perfil',       label:'Arquitetura e assinatura do projeto',     hint:'Projeto autoral, arquiteto renomado, paisagismo assinado — a autoria.'},
+  {id:'sc_per4', cat:'Perfil',       label:'Sustentabilidade, eficiência e tecnologia', hint:'Selos AQUA/LEED, smart home, eficiência energética, captação de água.'},
+  // Serviços
+  {id:'sc_srv1', cat:'Serviços',     label:'Wellness',                               hint:'Spa, terapias, nutrição, práticas integrativas dentro do condomínio.'},
+  {id:'sc_srv2', cat:'Serviços',     label:'Longevity Living',                       hint:'Ergonomia de longo prazo, medicina preventiva, autonomia ao longo das décadas.'},
+  {id:'sc_srv3', cat:'Serviços',     label:'Branded Residences',                     hint:'Assinatura de marca global de luxo (hotelaria, moda, design).'},
+  {id:'sc_srv4', cat:'Serviços',     label:'Hospitality Services',                   hint:'Concierge, room service, governança, valet — padrão hoteleiro no dia a dia.'},
+];
+const SCORE_CATS = ['Localização','Imóvel','Segurança','Lazer','Financeiro','Perfil','Serviços'];
+const STATUS_BADGE = {
+  'Disponível':'badge-green','Reservado':'badge-gold',
+  'Vendido':'badge-gray','Lançamento':'badge-teal'
+};
+const ESTAGIO_BADGE = {
+  'Na planta':'badge-teal','Em obras':'badge-gold',
+  'Pronto novo':'badge-green','Revenda':'badge-gray'
+};
+
+// ══ STATE ══
+let db = [];
+let currentId = null;
+let editingId = null;
+let sortCol = 'criadoEm';
+let sortDir = -1;
+
+// ══ LOAD ══
+function loadDB() {
+  try { db = JSON.parse(localStorage.getItem(DB_KEY) || '[]'); }
+  catch(e) { db = []; }
+}
+
+// ══ INIT ══
+function init() {
+  loadDB();
+  buildCheckGroup('check-diferenciais', DIFERENCIAIS, 'dif_', 'cnt-dif');
+  buildCheckGroup('check-faixas',       FAIXAS,       'fx_');
+  buildCheckGroup('check-motivacoes',   MOTIVACOES,   'mot_');
+  buildCheckGroup('check-finalidade',   FINALIDADES,  'fin_');
+  buildCheckGroup('check-horizonte',    HORIZONTES,   'hor_');
+  buildScoreGrid();
+  renderAll();
+}
+
+function buildCheckGroup(containerId, items, prefix, counterId) {
+  const el = document.getElementById(containerId);
+  if(!el) return;
+  el.innerHTML = items.map(item => {
+    const safeId = prefix + item.replace(/[^a-z0-9]/gi,'_');
+    return `<label class="check-option">
+      <input type="checkbox" id="${safeId}" value="${item}"${counterId ? ` onchange="updateCounter('${containerId}','${counterId}')"` : ''}>
+      <span class="chk-box"></span>
+      <span class="chk-label">${item}</span>
+    </label>`;
+  }).join('');
+}
+
+function updateCounter(containerId, counterId) {
+  const n = document.querySelectorAll(`#${containerId} input:checked`).length;
+  const el = document.getElementById(counterId);
+  if(el) el.textContent = n;
+}
+
+function buildScoreGrid() {
+  const el = document.getElementById('score-grid');
+  el.innerHTML = SCORE_CATS.map(cat => {
+    const items = SCORES.filter(s => s.cat === cat);
+    const rows = items.map(s =>
+      '<div class="score-item">' +
+        '<div class="score-item-header">' +
+          '<span class="score-item-label">' + s.label + '</span>' +
+          '<span class="score-item-val" id="' + s.id + '_val">5</span>' +
+        '</div>' +
+        (s.hint ? '<div class="score-hint">' + s.hint + '</div>' : '') +
+        '<div class="score-bar-track"><div class="score-bar-fill" id="' + s.id + '_bar" style="width:50%"></div></div>' +
+        '<input type="range" id="' + s.id + '" min="1" max="10" value="5" oninput="updateScore(\'' + s.id + '\')">' +
+      '</div>'
+    ).join('');
+    return '<div class="score-cat-block"><div class="score-cat-title">' + cat + '</div><div class="score-cat-grid">' + rows + '</div></div>';
+  }).join('');
+}
+
+function updateScore(id) {
+  const v = parseInt(document.getElementById(id).value);
+  document.getElementById(id+'_val').textContent = v;
+  document.getElementById(id+'_bar').style.width = (v*10)+'%';
+}
+
+// ══ TABS ══
+function switchTab(tab) {
+  document.querySelectorAll('.tab-btn').forEach(b => {
+    b.classList.toggle('active', b.textContent.toLowerCase().startsWith(tab==='dashboard'?'dash':'lista'));
+  });
+  document.getElementById('view-dashboard').classList.toggle('active', tab==='dashboard');
+  document.getElementById('view-lista').classList.toggle('active', tab==='lista');
+  if(tab==='lista') renderLista();
+}
+
+// ══ MODAL TABS ══
+function switchModalTab(tab) {
+  document.querySelectorAll('.modal-tab').forEach((b,i) => {
+    b.classList.toggle('active', ['objetivo','curadoria','scores'][i]===tab);
+  });
+  ['objetivo','curadoria','scores'].forEach(t => {
+    document.getElementById('mpanel-'+t).classList.toggle('active', t===tab);
+  });
+}
+
+// ══ FORM ══
+function openForm(id=null) {
+  editingId = id;
+  clearForm();
+  if(id) {
+    const item = db.find(x=>x.id===id);
+    if(item) populateForm(item);
+    document.getElementById('form-header-badge').textContent = 'Editar Empreendimento';
+    document.getElementById('save-btn-label').textContent = 'Salvar Alterações';
+  } else {
+    document.getElementById('form-header-badge').textContent = 'Novo Empreendimento';
+    document.getElementById('save-btn-label').textContent = 'Salvar Empreendimento';
+  }
+  document.getElementById('form-view').style.display = 'block';
+  document.getElementById('detail-modal').classList.remove('open');
+  document.getElementById('form-view').scrollTop = 0;
+}
+
+function closeForm() {
+  document.getElementById('form-view').style.display = 'none';
+}
+
+function clearForm() {
+  const textIds = ['f_nome','f_construtora','f_endereco','f_link','f_area_priv','f_area_total',
+    'f_andar','f_vista','f_valor','f_condominio','f_entrega',
+    'f_proposta','f_pontos_fortes','f_atencao','f_nao_indicar','f_obs'];
+  textIds.forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+  const selIds = ['f_status','f_bairro','f_estagio','f_tipologia','f_suites',
+    'f_vagas','f_margem','f_financiamento','f_permuta'];
+  selIds.forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+  document.querySelectorAll('#form-view input[type=checkbox]').forEach(cb => cb.checked=false);
+  updateCounter('check-diferenciais','cnt-dif');
+  SCORES.forEach(s => { document.getElementById(s.id).value=5; updateScore(s.id); });
+}
+
+function populateForm(item) {
+  const setV = (id,v) => { const el=document.getElementById(id); if(el&&v!=null) el.value=v; };
+  setV('f_nome',item.nome); setV('f_construtora',item.construtora);
+  setV('f_status',item.status); setV('f_bairro',item.bairro);
+  setV('f_endereco',item.endereco); setV('f_link',item.link);
+  setV('f_estagio',item.estagio); setV('f_tipologia',item.tipologia);
+  setV('f_area_priv',item.area_priv); setV('f_area_total',item.area_total);
+  setV('f_suites',item.suites); setV('f_vagas',item.vagas);
+  setV('f_andar',item.andar); setV('f_vista',item.vista);
+  setV('f_valor',item.valor); setV('f_condominio',item.condominio);
+  setV('f_margem',item.margem); setV('f_entrega',item.entrega);
+  setV('f_financiamento',item.financiamento); setV('f_permuta',item.permuta);
+  setV('f_proposta',item.proposta); setV('f_pontos_fortes',item.pontos_fortes);
+  setV('f_atencao',item.atencao); setV('f_nao_indicar',item.nao_indicar);
+  setV('f_obs',item.obs);
+
+  const restoreChecks = (containerId, values=[]) => {
+    values.forEach(v => {
+      const cb = document.querySelector(`#${containerId} input[value="${v}"]`);
+      if(cb) cb.checked=true;
+    });
+  };
+  restoreChecks('check-diferenciais', item.diferenciais);
+  restoreChecks('check-faixas',       item.faixas);
+  restoreChecks('check-motivacoes',   item.motivacoes);
+  restoreChecks('check-finalidade',   item.finalidade);
+  restoreChecks('check-horizonte',    item.horizonte);
+  updateCounter('check-diferenciais','cnt-dif');
+
+  SCORES.forEach(s => {
+    const v = (item.scores && item.scores[s.id] != null) ? item.scores[s.id] : 5;
+    document.getElementById(s.id).value = v;
+    updateScore(s.id);
+  });
+}
+
+function getCheckedVals(containerId) {
+  return [...document.querySelectorAll(`#${containerId} input[type=checkbox]:checked`)].map(cb=>cb.value);
+}
+
+function saveEmpreendimento() {
+  const nome   = document.getElementById('f_nome').value.trim();
+  const status = document.getElementById('f_status').value;
+  const bairro = document.getElementById('f_bairro').value;
+  const estagio= document.getElementById('f_estagio').value;
+  const valor  = document.getElementById('f_valor').value.trim();
+
+  if(!nome||!status||!bairro||!estagio||!valor) {
+    showToast('Preencha os campos obrigatórios: Nome, Status, Bairro, Estágio e Valor.','error');
+    return;
+  }
+
+  const scores = {};
+  SCORES.forEach(s => { scores[s.id] = parseInt(document.getElementById(s.id).value); });
+
+  const existing = editingId ? db.find(x=>x.id===editingId) : null;
+  const item = {
+    id:          editingId || Date.now().toString(),
+    criadoEm:   existing ? existing.criadoEm : new Date().toISOString(),
+    atualizadoEm: new Date().toISOString(),
+    nome, construtora: document.getElementById('f_construtora').value.trim(),
+    status, bairro,
+    endereco:    document.getElementById('f_endereco').value.trim(),
+    link:        document.getElementById('f_link').value.trim(),
+    estagio,     tipologia: document.getElementById('f_tipologia').value,
+    area_priv:   document.getElementById('f_area_priv').value,
+    area_total:  document.getElementById('f_area_total').value,
+    suites:      document.getElementById('f_suites').value,
+    vagas:       document.getElementById('f_vagas').value,
+    andar:       document.getElementById('f_andar').value.trim(),
+    vista:       document.getElementById('f_vista').value.trim(),
+    valor,       condominio: document.getElementById('f_condominio').value.trim(),
+    margem:      document.getElementById('f_margem').value,
+    entrega:     document.getElementById('f_entrega').value.trim(),
+    financiamento: document.getElementById('f_financiamento').value,
+    permuta:     document.getElementById('f_permuta').value,
+    diferenciais: getCheckedVals('check-diferenciais'),
+    faixas:      getCheckedVals('check-faixas'),
+    motivacoes:  getCheckedVals('check-motivacoes'),
+    finalidade:  getCheckedVals('check-finalidade'),
+    horizonte:   getCheckedVals('check-horizonte'),
+    scores,
+    proposta:    document.getElementById('f_proposta').value.trim(),
+    pontos_fortes: document.getElementById('f_pontos_fortes').value.trim(),
+    atencao:     document.getElementById('f_atencao').value.trim(),
+    nao_indicar: document.getElementById('f_nao_indicar').value.trim(),
+    obs:         document.getElementById('f_obs').value.trim(),
+  };
+
+  if(editingId) {
+    db = db.map(x => x.id===editingId ? item : x);
+  } else {
+    db.unshift(item);
+  }
+  persist();
+  closeForm();
+  renderAll();
+  showToast(editingId ? 'Empreendimento atualizado com sucesso.' : 'Empreendimento cadastrado com sucesso!', 'success');
+}
+
+// ══ PERSIST ══
+function persist() { localStorage.setItem(DB_KEY, JSON.stringify(db)); }
+
+// ══ RENDER ══
+function renderAll() {
+  document.getElementById('totalCount').textContent = db.length;
+  renderDashboard();
+  updateBairroFilter();
+  if(document.getElementById('view-lista').classList.contains('active')) renderLista();
+}
+
+function renderDashboard() {
+  const total = db.length;
+  const disponiveis = db.filter(x=>x.status==='Disponível').length;
+  const bairros = new Set(db.map(x=>x.bairro).filter(Boolean)).size;
+  const lancamentos = db.filter(x=>['Na planta','Em obras'].includes(x.estagio)).length;
+  const prontos = db.filter(x=>['Pronto novo','Revenda'].includes(x.estagio)).length;
+  const valores = db.map(x=>parseMoneyStr(x.valor)).filter(v=>v>0);
+  const ticketMedio = valores.length ? Math.round(valores.reduce((a,b)=>a+b,0)/valores.length) : 0;
+
+  document.getElementById('ds-total').textContent = total;
+  document.getElementById('ds-disponiveis').textContent = disponiveis;
+  document.getElementById('ds-ticket').textContent = ticketMedio ? 'R$'+formatNum(ticketMedio) : '—';
+  document.getElementById('ds-bairros').textContent = bairros;
+  document.getElementById('ds-lancamentos').textContent = lancamentos;
+  document.getElementById('ds-prontos').textContent = prontos;
+
+  const el = document.getElementById('dash-table-container');
+  if(!total) {
+    el.innerHTML = emptyHTML('🏛️','Nenhum empreendimento cadastrado','Clique em "Novo Empreendimento" para começar.');
+    return;
+  }
+  const recent = [...db].slice(0,8);
+  el.innerHTML = buildTable(recent, false);
+}
+
+function renderLista() {
+  const busca  = document.getElementById('f-busca').value.toLowerCase();
+  const fStatus= document.getElementById('f-status').value;
+  const fEstag = document.getElementById('f-estagio').value;
+  const fBairro= document.getElementById('f-bairro').value;
+  const fFaixa = document.getElementById('f-faixa').value;
+
+  let filtered = db.filter(x => {
+    if(busca && !`${x.nome} ${x.bairro} ${x.construtora}`.toLowerCase().includes(busca)) return false;
+    if(fStatus && x.status!==fStatus) return false;
+    if(fEstag  && x.estagio!==fEstag) return false;
+    if(fBairro && x.bairro!==fBairro) return false;
+    if(fFaixa) {
+      const [min,max] = fFaixa.split('-').map(Number);
+      const v = parseMoneyStr(x.valor);
+      if(v < min || v > max) return false;
+    }
+    return true;
+  });
+
+  // sort
+  filtered.sort((a,b) => {
+    let va = a[sortCol]; let vb = b[sortCol];
+    if(sortCol==='valor') { va=parseMoneyStr(va); vb=parseMoneyStr(vb); }
+    else if(sortCol==='area_priv'||sortCol==='suites'||sortCol==='vagas') { va=Number(va)||0; vb=Number(vb)||0; }
+    else { va=(va||'').toString().toLowerCase(); vb=(vb||'').toString().toLowerCase(); }
+    return va<vb ? -sortDir : va>vb ? sortDir : 0;
+  });
+
+  const countEl = document.getElementById('filter-count');
+  countEl.textContent = filtered.length !== db.length ? `${filtered.length} de ${db.length} imóveis` : '';
+
+  const el = document.getElementById('lista-table-container');
+  if(!db.length) { el.innerHTML = emptyHTML('🏛️','Nenhum empreendimento cadastrado'); return; }
+  if(!filtered.length) { el.innerHTML = emptyHTML('🔍','Nenhum resultado','Ajuste os filtros acima.'); return; }
+  el.innerHTML = buildTable(filtered, true);
+}
+
+function buildTable(items, sortable) {
+  const cols = [
+    {key:'nome',     label:'Empreendimento'},
+    {key:'bairro',   label:'Bairro'},
+    {key:'estagio',  label:'Estágio'},
+    {key:'status',   label:'Status'},
+    {key:'valor',    label:'Valor'},
+    {key:'suites',   label:'Suítes'},
+    {key:'vagas',    label:'Vagas'},
+    {key:'area_priv',label:'m²'},
+    {key:'_actions', label:'', nosort:true},
+  ];
+
+  const heads = cols.map(c => {
+    if(c.nosort||!sortable) return `<th>${c.label}</th>`;
+    const active = sortCol===c.key;
+    const cls = ['sortable', active?(sortDir>0?'sort-asc':'sort-desc'):''].filter(Boolean).join(' ');
+    return `<th class="${cls}" onclick="sortBy('${c.key}')">${c.label}</th>`;
+  }).join('');
+
+  const rows = items.map(x => `<tr>
+    <td class="td-nome" style="cursor:pointer" onclick="openDetail('${x.id}')">${esc(x.nome)}<small>${esc(x.construtora||'')}</small></td>
+    <td>${esc(x.bairro||'—')}</td>
+    <td><span class="badge ${ESTAGIO_BADGE[x.estagio]||'badge-gray'}">${esc(x.estagio||'—')}</span></td>
+    <td><span class="badge ${STATUS_BADGE[x.status]||'badge-gray'}">${esc(x.status||'—')}</span></td>
+    <td style="white-space:nowrap">${x.valor?'R$ '+esc(x.valor):'—'}</td>
+    <td>${x.suites||'—'}</td>
+    <td>${x.vagas||'—'}</td>
+    <td>${x.area_priv?x.area_priv+' m²':'—'}</td>
+    <td><div style="display:flex;gap:6px;justify-content:flex-end;">
+      <button class="btn-action" onclick="openDetail('${x.id}')">Ver</button>
+      <button class="btn-action" onclick="openForm('${x.id}')">Editar</button>
+    </div></td>
+  </tr>`).join('');
+
+  return `<table><thead><tr>${heads}</tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+function sortBy(col) {
+  if(sortCol===col) sortDir*=-1; else { sortCol=col; sortDir=1; }
+  renderLista();
+}
+
+function emptyHTML(icon,title,sub='') {
+  return `<div class="empty-state"><div class="empty-icon">${icon}</div><div class="empty-title">${title}</div>${sub?`<div class="empty-sub">${sub}</div>`:''}</div>`;
+}
+
+// ══ FILTERS ══
+function applyFilters() { renderLista(); }
+function clearFilters() {
+  ['f-busca','f-status','f-estagio','f-bairro','f-faixa'].forEach(id => {
+    document.getElementById(id).value='';
+  });
+  applyFilters();
+}
+function updateBairroFilter() {
+  const sel = document.getElementById('f-bairro');
+  const cur = sel.value;
+  const bairros = [...new Set(db.map(x=>x.bairro).filter(Boolean))].sort();
+  sel.innerHTML = '<option value="">Todos os bairros</option>' +
+    bairros.map(b=>`<option${b===cur?' selected':''}>${esc(b)}</option>`).join('');
+}
+
+// ══ DETAIL MODAL ══
+function openDetail(id) {
+  const x = db.find(i=>i.id===id);
+  if(!x) return;
+  currentId = id;
+
+  document.getElementById('md-nome').textContent = x.nome;
+  document.getElementById('md-sub').textContent =
+    [x.construtora, x.bairro, x.estagio].filter(Boolean).join(' · ');
+
+  // Panel Objetivo
+  document.getElementById('md-objetivo-content').innerHTML = `
+    <div>
+      <div class="modal-section-title">Localização</div>
+      ${mRow('Bairro', x.bairro)} ${mRow('Endereço', x.endereco)}
+      ${x.link ? `<div class="modal-row"><span class="modal-row-label">Apresentação</span><span class="modal-row-value"><a href="${esc(x.link)}" target="_blank" style="color:var(--teal)">Ver link ↗</a></span></div>` : ''}
+      <div style="margin-top:18px;" class="modal-section-title">Características</div>
+      ${mRow('Tipologia', x.tipologia)} ${mRow('Estágio', x.estagio)}
+      ${mRow('Área privativa', x.area_priv?x.area_priv+' m²':null)}
+      ${mRow('Área total', x.area_total?x.area_total+' m²':null)}
+      ${mRow('Suítes', x.suites)} ${mRow('Vagas', x.vagas)}
+      ${mRow('Andar', x.andar)} ${mRow('Vista', x.vista)}
+    </div>
+    <div>
+      <div class="modal-section-title">Comercial</div>
+      ${mRow('Status', x.status)}
+      ${mRow('Valor', x.valor?'R$ '+x.valor:null)}
+      ${mRow('Condomínio', x.condominio?'R$ '+x.condominio+'/mês':null)}
+      ${mRow('Margem', x.margem)} ${mRow('Entrega', x.entrega)}
+      ${mRow('Financiamento', x.financiamento)} ${mRow('Permuta', x.permuta)}
+      ${(x.diferenciais||[]).length ? `
+      <div style="margin-top:18px;" class="modal-section-title">Diferenciais</div>
+      <div class="tag-list" style="margin-top:8px;">${(x.diferenciais||[]).map(d=>`<span class="tag">${esc(d)}</span>`).join('')}</div>` : ''}
+    </div>`;
+
+  // Panel Curadoria
+  const curadoria = [];
+  if((x.faixas||[]).length) curadoria.push(['Faixas compatíveis',(x.faixas||[]).join(', ')]);
+  if((x.motivacoes||[]).length) curadoria.push(['Motivações — Pilar I',(x.motivacoes||[]).join(', ')]);
+  if((x.finalidade||[]).length) curadoria.push(['Finalidade — Pilar II',(x.finalidade||[]).join(', ')]);
+  if((x.horizonte||[]).length) curadoria.push(['Horizonte — Pilar V',(x.horizonte||[]).join(', ')]);
+  if(x.proposta) curadoria.push(['Proposta de valor', x.proposta]);
+  if(x.pontos_fortes) curadoria.push(['Pontos fortes', x.pontos_fortes]);
+  if(x.atencao) curadoria.push(['Pontos de atenção', x.atencao]);
+  if(x.nao_indicar) curadoria.push(['Não indicar para', x.nao_indicar]);
+  if(x.obs) curadoria.push(['Obs. internas', x.obs]);
+  document.getElementById('md-curadoria-content').innerHTML = curadoria.length
+    ? curadoria.map(([l,v])=>mRow(l,v)).join('')
+    : '<div class="empty-state" style="padding:32px"><div class="empty-title">Nenhum dado de curadoria preenchido</div></div>';
+
+  // Panel Scores — grouped by category
+  const sc = x.scores || {};
+  const allVals = SCORES.map(s => sc[s.id] || 5);
+  const globalAvg = (allVals.reduce((a,b)=>a+b,0)/allVals.length).toFixed(1);
+
+  // Build category summaries + detail rows
+  let scoresHTML = '<div style="margin-bottom:20px;">';
+  scoresHTML += '<div class="score-display-label" style="font-weight:600;color:var(--dark);font-size:14px;margin-bottom:12px;">Resumo por Categoria</div>';
+  scoresHTML += '<div class="score-display-grid">';
+  SCORE_CATS.forEach(cat => {
+    const items = SCORES.filter(s => s.cat === cat);
+    const catAvg = items.reduce((a,s) => a + (sc[s.id]||5), 0) / items.length;
+    const pct = (catAvg/10*100).toFixed(0);
+    const color = catAvg >= 7 ? 'var(--green)' : catAvg >= 4 ? 'var(--teal)' : 'var(--gold)';
+    scoresHTML += '<div class="score-display-item">' +
+      '<div class="score-display-label">' + cat + '</div>' +
+      '<div class="score-display-bar">' +
+        '<div class="score-display-track"><div class="score-display-fill" style="width:' + pct + '%;background:' + color + '"></div></div>' +
+        '<div class="score-display-val" style="color:' + color + '">' + catAvg.toFixed(1) + '</div>' +
+      '</div></div>';
+  });
+  scoresHTML += '</div>';
+  scoresHTML += '<div style="margin-top:12px;padding:12px 16px;background:var(--bg);border-radius:8px;display:flex;align-items:center;justify-content:space-between;">' +
+    '<span style="font-size:13px;color:var(--text-mid)">Score médio global</span>' +
+    '<span style="font-size:22px;font-weight:700;font-family:Playfair Display,serif;color:var(--teal)">' + globalAvg + '<span style="font-size:13px;font-weight:400;color:var(--text-soft)">/10</span></span>' +
+  '</div></div>';
+
+  // Detail per category
+  SCORE_CATS.forEach(cat => {
+    const items = SCORES.filter(s => s.cat === cat);
+    scoresHTML += '<div style="margin-bottom:18px;">';
+    scoresHTML += '<div class="score-cat-title" style="font-size:11px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--teal);border-bottom:1px solid var(--teal-light);padding-bottom:8px;margin-bottom:12px;">' + cat + '</div>';
+    items.forEach(s => {
+      const v = sc[s.id] || 5;
+      const color = v >= 7 ? 'var(--green)' : v >= 4 ? 'var(--teal)' : 'var(--gold)';
+      scoresHTML += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">' +
+        '<div style="flex:1;font-size:12px;color:var(--text-mid)">' + s.label + '</div>' +
+        '<div style="flex:1;display:flex;align-items:center;gap:8px;">' +
+          '<div class="score-display-track" style="flex:1"><div class="score-display-fill" style="width:' + (v*10) + '%;background:' + color + '"></div></div>' +
+          '<div style="font-size:12px;font-weight:600;color:' + color + ';min-width:20px">' + v + '</div>' +
+        '</div></div>';
+    });
+    scoresHTML += '</div>';
+  });
+
+  document.getElementById('md-scores-content').innerHTML = scoresHTML;
+
+  switchModalTab('objetivo');
+  document.getElementById('detail-modal').classList.add('open');
+}
+
+function mRow(label, value) {
+  if(!value) return '';
+  return `<div class="modal-row"><span class="modal-row-label">${esc(label)}</span><span class="modal-row-value">${esc(value)}</span></div>`;
+}
+
+function closeModal(e) { if(e.target.id==='detail-modal') closeModalBtn(); }
+function closeModalBtn() { document.getElementById('detail-modal').classList.remove('open'); }
+function editFromModal() { openForm(currentId); }
+
+// ══ DELETE ══
+function confirmDelete() {
+  if(!currentId) return;
+  document.getElementById('confirm-overlay').classList.add('open');
+}
+function closeConfirm() { document.getElementById('confirm-overlay').classList.remove('open'); }
+function doDelete() {
+  db = db.filter(x=>x.id!==currentId);
+  persist(); renderAll();
+  closeConfirm(); closeModalBtn();
+  showToast('Empreendimento excluído.','success');
+  currentId=null;
+}
+
+// ══ IMPORT / EXPORT ══
+function openImportExport() { document.getElementById('io-overlay').classList.add('open'); }
+function closeIO() { document.getElementById('io-overlay').classList.remove('open'); }
+function exportJSON() {
+  const blob = new Blob([JSON.stringify(db,null,2)],{type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `empreendimentos_${new Date().toISOString().slice(0,10)}.json`;
+  a.click(); URL.revokeObjectURL(a.href);
+  showToast('Arquivo exportado com sucesso.','success');
+}
+function importJSON(input) {
+  const file = input.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const data = JSON.parse(e.target.result);
+      if(!Array.isArray(data)) throw new Error('Formato inválido');
+      db = data;
+      persist(); renderAll(); closeIO();
+      showToast(`${db.length} empreendimentos importados.`,'success');
+    } catch(err) {
+      showToast('Erro ao importar: JSON inválido.','error');
+    }
+    input.value='';
+  };
+  reader.readAsText(file);
+}
+
+// ══ UTILS ══
+function maskMoney(el) {
+  let v = el.value.replace(/\D/g,'');
+  if(!v){el.value='';return;}
+  el.value = parseInt(v,10).toString().replace(/\B(?=(\d{3})+(?!\d))/g,'.');
+}
+function parseMoneyStr(str) {
+  if(!str) return 0;
+  return parseInt((str+'').replace(/\./g,'').replace(/,/g,''),10)||0;
+}
+function formatNum(n) { return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g,'.'); }
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function showToast(msg,type='') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast'+(type?' '+type:'');
+  el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),3200);
+}
+
+// ══ START ══
+init();
+</script>
+</body>
+</html>

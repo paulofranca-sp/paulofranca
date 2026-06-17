@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Paulo França — Curadoria Imobiliária</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:#0C1B2E;color:white;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:0.18em;color:white;margin-bottom:6px;}
+.tagline{font-size:12px;letter-spacing:0.2em;text-transform:uppercase;color:#C4933F;margin-bottom:60px;}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;width:100%;max-width:900px;}
+.card{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:28px 24px;text-decoration:none;color:white;transition:all 0.2s;display:flex;flex-direction:column;gap:10px;}
+.card:hover{background:rgba(255,255,255,0.09);border-color:rgba(200,160,80,0.4);transform:translateY(-2px);}
+.card-eyebrow{font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#C4933F;}
+.card-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;}
+.card-desc{font-size:13px;color:rgba(255,255,255,0.55);line-height:1.6;}
+.card-arrow{font-size:18px;margin-top:auto;padding-top:12px;color:#C4933F;}
+.client-section{margin-top:48px;text-align:center;}
+.client-label{font-size:11px;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,255,0.35);margin-bottom:20px;}
+.client-btn{display:inline-flex;align-items:center;gap:10px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:500;padding:16px 36px;border-radius:8px;cursor:pointer;background:#0891B2;color:white;border:none;text-decoration:none;transition:all 0.2s;}
+.client-btn:hover{background:#0E7490;}
+.footer{margin-top:60px;font-size:11px;color:rgba(255,255,255,0.2);text-align:center;letter-spacing:0.08em;}
+</style>
+</head>
+<body>
+
+<div class="logo">PAULO FRANÇA</div>
+<div class="tagline">Curadoria Imobiliária de Alto Padrão</div>
+
+<!-- ÁREA DO CLIENTE -->
+<div style="width:100%;max-width:900px;text-align:center;margin-bottom:48px;">
+  <div class="client-label">Para clientes</div>
+  <a class="client-btn" href="anamnese.html">
+    <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+    Iniciar Anamnese Imobiliária
+  </a>
+  <div style="font-size:12px;color:rgba(255,255,255,0.3);margin-top:12px;">Diagnóstico personalizado · 5–8 minutos · Confidencial</div>
+</div>
+
+<!-- ÁREA INTERNA — PAULO -->
+<div style="width:100%;max-width:900px;">
+  <div class="client-label" style="text-align:center;">Área interna — Paulo França</div>
+  <div class="cards">
+    <a class="card" href="pesos.html">
+      <div class="card-eyebrow">Etapa 2</div>
+      <div class="card-title">Mapa de Preferências</div>
+      <div class="card-desc">Calibração dos 27 critérios com pesos de 1 a 5. Gera o perfil completo do cliente.</div>
+      <div class="card-arrow">→</div>
+    </a>
+    <a class="card" href="empreendimentos.html">
+      <div class="card-eyebrow">Banco de Dados</div>
+      <div class="card-title">Empreendimentos</div>
+      <div class="card-desc">Cadastro de imóveis com dados objetivos e scores interpretativos por critério.</div>
+      <div class="card-arrow">→</div>
+    </a>
+    <a class="card" href="motor.html">
+      <div class="card-eyebrow">Etapa 4</div>
+      <div class="card-title">Motor de Compatibilidade</div>
+      <div class="card-desc">Cruza o perfil do cliente com os imóveis do banco. Gera ranking e relatório para a call.</div>
+      <div class="card-arrow">→</div>
+    </a>
+  </div>
+</div>
+
+<div class="footer">© Paulo França · Sistema de Curadoria Imobiliária</div>
+
+</body>
+</html>
