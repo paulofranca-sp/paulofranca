@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Questionário de Calibração — Paulo França</title>
+<title>Mapa de Preferências — Paulo França</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500&family=Bebas+Neue&display=swap" rel="stylesheet">
@@ -215,10 +215,10 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 <div id="intro">
   <div class="intro-logo">PAULO FRANÇA</div>
   <div class="intro-eyebrow">Etapa 2 do Processo Consultivo</div>
-  <h1 class="intro-title">Questionário de<br><em>Calibração</em></h1>
+  <h1 class="intro-title">Mapa de<br><em>Preferências</em></h1>
   <p class="intro-sub">Cada critério que você pondera aqui refina a curadoria dos imóveis que serão apresentados. Não há respostas certas — há a sua verdade.</p>
   <button class="btn-start-pesos" onclick="showApp()">
-    Iniciar Calibração
+    Iniciar Mapa de Preferências
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
   </button>
   <div class="intro-trust">
@@ -648,7 +648,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
         <button class="nav-back" onclick="goTo(7)">← Voltar</button>
         <div class="a-nav-info">7 de 7</div>
         <button class="nav-next" id="submitBtn" onclick="submitForm()" style="background:#16A34A;">
-          Concluir Calibração
+          Concluir Mapa de Preferências
           <svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
         </button>
       </div>
@@ -661,7 +661,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
     <div class="success-icon-wrap">
       <svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
     </div>
-    <h2 class="success-title">Calibração <em>concluída!</em></h2>
+    <h2 class="success-title">Mapa de Preferências <em>concluído!</em></h2>
     <p class="success-sub">Obrigado, <strong id="successName" style="font-weight:500;"></strong>. Suas preferências foram registradas e já fazem parte da curadoria.</p>
 
     <div class="success-card" style="max-width:520px; margin-bottom:12px;">
@@ -675,20 +675,9 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
       <div class="success-card-sub">Paulo analisará seu diagnóstico completo e entrará em contato para apresentar os imóveis mais alinhados ao seu perfil.</div>
       <a class="btn-action" href="https://calendar.app.google/dffTZGue9T52RuEe9" target="_blank">
         <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-        Agendar minha consultoria
+        Falar com Paulo França
       </a>
 
-      <div style="margin-top:20px;display:flex;flex-direction:column;gap:10px;max-width:480px;margin-left:auto;margin-right:auto;">
-        <button onclick="exportPesos()" style="display:inline-flex;align-items:center;gap:8px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;padding:12px 20px;border-radius:8px;cursor:pointer;border:1px solid #CBD5E1;background:white;color:#1E293B;width:100%;justify-content:center;transition:all 0.2s;" onmouseover="this.style.background='#F8FAFC'" onmouseout="this.style.background='white'">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;flex-shrink:0"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          Baixar só os Pesos (JSON)
-        </button>
-        <button onclick="mergeAndExport()" style="display:inline-flex;align-items:center;gap:8px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;padding:12px 20px;border-radius:8px;cursor:pointer;background:#0891B2;color:white;border:none;width:100%;justify-content:center;transition:all 0.2s;" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;flex-shrink:0"><path d="M8 17l4 4 4-4"/><path d="M12 12v9"/><path d="M20.88 18.09A5 5 0 0018 9h-1.26A8 8 0 103 16.29"/></svg>
-          Mesclar com Anamnese + Baixar Perfil Completo
-        </button>
-        <p style="font-size:11px;color:#94A3B8;text-align:center;line-height:1.5;margin-top:4px;">O <strong>Perfil Completo</strong> une Anamnese + Pesos num único arquivo — use-o no Motor de Compatibilidade para cruzar com os imóveis do banco.</p>
-      </div>
     </div>
     <p style="font-size:12px;color:var(--text-soft);font-style:italic;margin-top:12px;">Agenda disponível a partir de 2 dias úteis após esta data.</p>
   </div>
@@ -904,13 +893,13 @@ async function submitForm() {
     await emailjs.send('service_alesa01', 'template_pesos_v1', {
       to_email: 'paulofranca.spimoveis@gmail.com', to_name: 'Paulo França',
       from_name: name, client_email: email,
-      subject: 'Questionário de Calibração — ' + name,
+      subject: 'Mapa de Preferências — ' + name,
       message: body
     });
     await emailjs.send('service_alesa01', 'template_pesos_v1', {
       to_email: email, to_name: name, from_name: 'Paulo França',
-      subject: 'Sua Calibração foi recebida',
-      message: 'Olá, ' + name + '!\n\nSeu Questionário de Calibração foi concluído com sucesso.\n\nPaulo analisará suas preferências e entrará em contato para apresentar uma seleção de imóveis alinhados ao seu perfil.\n\nAtenciosamente,\nPaulo França'
+      subject: 'Seu Mapa de Preferências foi recebido',
+      message: 'Olá, ' + name + '!\n\nSeu Mapa de Preferências foi concluído com sucesso.\n\nPaulo analisará suas preferências e entrará em contato para apresentar uma seleção de imóveis alinhados ao seu perfil.\n\nAtenciosamente,\nPaulo França'
     });
   } catch(e) {
     // E-mail falhou mas perfil já foi salvo e baixado — não bloqueia o cliente
