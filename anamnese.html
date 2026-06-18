@@ -1401,21 +1401,10 @@ async function submitForm() {
   document.getElementById('overlay').classList.add('show');
   document.getElementById('submitBtn').disabled = true;
 
-  // ── PASSO 1: salva perfil + download ANTES do e-mail ──
+  // ── PASSO 1: salva perfil no localStorage (sem download — fica transparente para o cliente) ──
   const perfilAnamnese = buildClientProfile();
   localStorage.setItem('pf_perfil_cliente', JSON.stringify(perfilAnamnese));
   localStorage.setItem('pf_perfil_etapa', 'anamnese');
-  // Download automático como backup
-  try {
-    const nomeSafe = perfilAnamnese.nome.replace(/[^a-zA-Z0-9]/g, '_');
-    const dataHoje = new Date().toISOString().slice(0, 10);
-    const blob = new Blob([JSON.stringify(perfilAnamnese, null, 2)], { type: 'application/json' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'anamnese_' + nomeSafe + '_' + dataHoje + '.json';
-    document.body.appendChild(a); a.click();
-    document.body.removeChild(a); URL.revokeObjectURL(a.href);
-  } catch(e) { console.warn('Auto-download falhou:', e); }
 
   // ── PASSO 2: mostra tela de sucesso ──
   document.getElementById('overlay').classList.remove('show');

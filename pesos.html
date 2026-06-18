@@ -841,7 +841,7 @@ async function submitForm() {
   document.getElementById('overlay').classList.add('show');
   document.getElementById('submitBtn').disabled = true;
 
-  // ── PASSO 1: salva perfil + download ANTES do e-mail (garante funcionamento mesmo se e-mail falhar) ──
+  // ── PASSO 1: salva perfil mesclado no localStorage (sem download — fica transparente para o cliente) ──
   const pesosData = buildPesosProfile();
   let perfilFinal = pesosData;
 
@@ -861,21 +861,6 @@ async function submitForm() {
   // Salva no localStorage para o Motor detectar automaticamente
   localStorage.setItem('pf_perfil_cliente', JSON.stringify(perfilFinal));
   localStorage.setItem('pf_perfil_etapa', 'completo');
-
-  // Download automático do perfil completo como backup
-  try {
-    const nomeSafe = perfilFinal.nome.replace(/[^a-zA-Z0-9]/g, '_');
-    const dataHoje = new Date().toISOString().slice(0, 10);
-    const nomeArq = perfilFinal._versao === 'perfil_completo_v1'
-      ? 'perfil_completo_' + nomeSafe + '_' + dataHoje + '.json'
-      : 'pesos_' + nomeSafe + '_' + dataHoje + '.json';
-    const blob = new Blob([JSON.stringify(perfilFinal, null, 2)], { type: 'application/json' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = nomeArq;
-    document.body.appendChild(a); a.click();
-    document.body.removeChild(a); URL.revokeObjectURL(a.href);
-  } catch(e) { console.warn('Auto-download falhou:', e); }
 
   // ── PASSO 2: mostra tela de sucesso ──
   document.getElementById('overlay').classList.remove('show');
