@@ -200,6 +200,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
         <div class="setup-title">Configurar Análise</div>
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn" onclick="buscarClientesOnline()">
+          <svg class="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/></svg>
+          Clientes Online
+        </button>
         <button class="btn" onclick="importarPerfil()">
           <svg class="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
           Importar perfil (JSON)
@@ -222,6 +226,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
             <button class="btn" style="margin-top:12px;" onclick="importarPerfil()">Importar perfil</button>
           </div>
         </div>
+        <div id="clientes-online-panel" style="display:none;margin-top:12px;border:1px solid var(--border,#ddd);border-radius:8px;max-height:260px;overflow-y:auto;"></div>
       </div>
 
       <!-- COLUNA IMÓVEIS -->
@@ -272,6 +277,56 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 // ══ CONFIG ══
 const DB_KEY = 'pf_empreendimentos_v1';
 const PERFIL_KEY = 'pf_perfil_cliente';
+
+// ══ SUPABASE — banco online de perfis de clientes ══
+const SUPABASE_URL = 'https://akvnoguimatxfbagbdgo.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_GMEmxNosMWyUzNUa8yJUyQ_zz02wkBj';
+let clientesOnline = [];
+
+async function buscarClientesOnline(autoload) {
+  const panel = document.getElementById('clientes-online-panel');
+  try {
+    const resp = await fetch(
+      `${SUPABASE_URL}/rest/v1/perfis_clientes?etapa=eq.completo&select=*&order=updated_at.desc`,
+      { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } }
+    );
+    if (!resp.ok) throw new Error('Falha na consulta');
+    clientesOnline = await resp.json();
+    renderClientesOnlinePanel();
+    if (!autoload) {
+      panel.style.display = clientesOnline.length ? 'block' : 'none';
+      showToast(clientesOnline.length ? `${clientesOnline.length} perfil(is) recebido(s) encontrado(s).` : 'Nenhum perfil completo recebido ainda.', clientesOnline.length ? 'success' : 'error');
+    } else if (clientesOnline.length) {
+      panel.style.display = 'block';
+    }
+  } catch (e) {
+    console.warn('Supabase indisponível:', e);
+    if (!autoload) showToast('Não foi possível buscar clientes online agora.', 'error');
+  }
+}
+
+function renderClientesOnlinePanel() {
+  const panel = document.getElementById('clientes-online-panel');
+  if (!clientesOnline.length) { panel.innerHTML = ''; return; }
+  panel.innerHTML = clientesOnline.map((c, i) => {
+    const data = c.updated_at ? new Date(c.updated_at).toLocaleString('pt-BR') : '';
+    return `<div onclick="carregarClienteOnline(${i})" style="padding:10px 12px;border-bottom:1px solid var(--border,#eee);cursor:pointer;display:flex;justify-content:space-between;gap:8px;">
+      <span><strong>${c.nome||'(sem nome)'}</strong><br><span style="font-size:12px;color:var(--text-soft,#888);">${c.email||''}</span></span>
+      <span style="font-size:12px;color:var(--text-soft,#888);white-space:nowrap;">${data}</span>
+    </div>`;
+  }).join('');
+}
+
+function carregarClienteOnline(i) {
+  const c = clientesOnline[i];
+  if (!c || !c.dados) return;
+  perfil = c.dados;
+  localStorage.setItem(PERFIL_KEY, JSON.stringify(perfil));
+  renderClienteCard();
+  updateRunBtn();
+  document.getElementById('clientes-online-panel').style.display = 'none';
+  showToast('Perfil de ' + (perfil.nome||'cliente') + ' carregado.', 'success');
+}
 
 const SCORE_CATS = ['Localização','Imóvel','Segurança','Lazer','Financeiro','Perfil','Serviços'];
 const SCORES = [
@@ -326,6 +381,7 @@ function init() {
       }
     }
   } catch(e) {}
+  buscarClientesOnline(true);
   renderImoveisList();
   updateRunBtn();
 }

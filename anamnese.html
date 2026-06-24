@@ -1396,6 +1396,34 @@ Visão de futuro: ${getVal('q5_6')}
 ${getVal('c_obs')}`;
 }
 
+// ══ SUPABASE — banco online de perfis de clientes ══
+const SUPABASE_URL = 'https://akvnoguimatxfbagbdgo.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_GMEmxNosMWyUzNUa8yJUyQ_zz02wkBj';
+
+async function salvarNoSupabase(perfil, etapa) {
+  try {
+    await fetch(`${SUPABASE_URL}/rest/v1/perfis_clientes?on_conflict=email`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Prefer': 'resolution=merge-duplicates,return=minimal'
+      },
+      body: JSON.stringify({
+        email: perfil.email,
+        nome: perfil.nome,
+        telefone: perfil.telefone,
+        etapa: etapa,
+        dados: perfil,
+        updated_at: new Date().toISOString()
+      })
+    });
+  } catch (e) {
+    console.warn('Supabase não disponível (silencioso, segue o fluxo):', e);
+  }
+}
+
 async function submitForm() {
   const name = getVal('c_name'), email = getVal('c_email'), phone = getVal('c_phone');
   const errEl = document.getElementById('submitErr');
@@ -1415,6 +1443,7 @@ async function submitForm() {
   const perfilAnamnese = buildClientProfile();
   localStorage.setItem('pf_perfil_cliente', JSON.stringify(perfilAnamnese));
   localStorage.setItem('pf_perfil_etapa', 'anamnese');
+  salvarNoSupabase(perfilAnamnese, 'anamnese');
 
   // ── PASSO 2: mostra tela de sucesso ──
   document.getElementById('overlay').classList.remove('show');
