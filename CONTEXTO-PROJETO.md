@@ -32,36 +32,94 @@ https://calendar.app.google/dffTZGue9T52RuEe9
 | pesos.html | Mapa de Preferências — 27 critérios | /paulofranca/pesos.html |
 | empreendimentos.html | Banco de imóveis | /paulofranca/empreendimentos.html |
 | motor.html | Motor de Compatibilidade | /paulofranca/motor.html |
+| precos.html | Painel de atualização rápida de preços (uso interno, celular) | /paulofranca/precos.html |
 | og-image.png | Imagem de prévia para links (WhatsApp/redes) | /paulofranca/og-image.png |
 
 ---
 
 ## ARQUITETURA DO SISTEMA
 
-### Fluxo completo
+### Fluxo completo (ATUALIZADO — Junho 2026, com Supabase)
 ```
 Cliente preenche anamnese.html
-    → grava localStorage (pf_perfil_cliente)
-    → baixa automaticamente: anamnese_NomeCliente_data.json
+    → grava localStorage (pf_perfil_cliente) — cache local da sessão
+    → grava também na nuvem (Supabase, tabela perfis_clientes, etapa='anamnese')
+    → envia e-mail de notificação (texto resumido, via EmailJS)
 
 Cliente preenche pesos.html
-    → lê anamnese do localStorage
+    → lê anamnese do localStorage (mesma sessão/navegador do cliente)
     → mescla os dois documentos
     → grava localStorage (pf_perfil_cliente) — agora completo
-    → baixa automaticamente: perfil_completo_NomeCliente_data.json
+    → grava também na nuvem (Supabase, mesma tabela, etapa='completo', mesmo e-mail = upsert)
+    → envia e-mail de notificação (texto resumido, via EmailJS)
 
-Paulo abre motor.html
-    → detecta perfil no localStorage automaticamente
-    → ou importa perfil_completo_*.json manualmente
+Paulo abre motor.html (em QUALQUER navegador/computador, não precisa mais ser o mesmo do teste)
+    → busca automaticamente na nuvem (Supabase) a lista de perfis com etapa='completo'
+    → mostra em "Clientes Online" — Paulo clica no nome do cliente desejado
+    → (ainda existe, como alternativa: detecção automática via localStorage se for mesmo navegador, e importação manual de JSON)
+    → busca também na nuvem o catálogo de empreendimentos (tabela empreendimentos)
     → seleciona imóveis do banco
     → gera relatório de compatibilidade
 ```
 
-### localStorage
-- Chave: `pf_perfil_cliente` — perfil JSON do cliente atual
+### BANCO DE DADOS ONLINE — SUPABASE (implementado Junho 2026)
+
+Motivo da mudança: o `localStorage` é isolado por navegador/dispositivo. Um cliente
+preenchendo o formulário no celular nunca poderia "chegar" automaticamente no
+computador de Paulo — são aparelhos diferentes. A solução foi migrar a troca de
+dados client↔Paulo para um banco online (Supabase), mantendo o localStorage apenas
+como cache de sessão (mesmo navegador).
+
+**Projeto Supabase:**
+- Project ref: `akvnoguimatxfbagbdgo`
+- Project URL: `https://akvnoguimatxfbagbdgo.supabase.co`
+- Região: South America (São Paulo)
+- Chave pública usada no código (`sb_publishable_...`): segura para ficar embutida nos arquivos `.html`, pois as permissões são limitadas pelas políticas RLS abaixo.
+- **Chave secreta (`sb_secret_...`): NUNCA deve entrar em nenhum arquivo `.html` público.** Fica guardada só por Paulo, fora do projeto.
+
+**Tabela `perfis_clientes`** (perfis de anamnese/pesos):
+```sql
+create table perfis_clientes (
+  id uuid primary key default gen_random_uuid(),
+  email text unique not null,
+  nome text,
+  telefone text,
+  etapa text,            -- 'anamnese' ou 'completo'
+  dados jsonb,           -- perfil completo (mesmo formato do localStorage)
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+-- RLS habilitado, políticas permitem insert/update/select para 'anon'
+```
+Upsert por `email` (on_conflict=email) — quando o cliente completa o Mapa de
+Preferências, o mesmo registro é atualizado (não duplica).
+
+**Tabela `empreendimentos`** (catálogo de imóveis):
+```sql
+create table empreendimentos (
+  id text primary key,   -- mesmo id já usado no localStorage (Date.now().toString())
+  nome text,
+  estagio text,          -- 'Na planta' | 'Em obras' | 'Pronto novo' | 'Revenda'
+  valor text,            -- valor formatado, ex: "2.500.000"
+  updated_at timestamptz default now(),
+  dados jsonb            -- item completo (mesmo formato do localStorage)
+);
+-- RLS habilitado, políticas permitem insert/update/select/delete para 'anon'
+```
+
+**Onde cada arquivo usa o Supabase:**
+- `anamnese.html` e `pesos.html` — ao enviar, gravam (upsert) em `perfis_clientes`.
+- `motor.html` — ao abrir, busca `perfis_clientes` (etapa='completo') para a lista "Clientes Online", e busca `empreendimentos` para o catálogo de imóveis (substituindo a antiga leitura exclusiva do localStorage).
+- `empreendimentos.html` — toda criação/edição/exclusão de imóvel grava também no Supabase. Tem um botão **"Sincronizar"** no topo, usado uma única vez para migrar o catálogo que já existia no localStorage para a nuvem.
+- `precos.html` (NOVO) — painel leve, mobile-first, para Paulo atualizar preços sem abrir o Banco de Empreendimentos completo. Duas funções:
+  1. **Edição manual** de preço por imóvel (busca por nome).
+  2. **Reajuste percentual por estágio** — aplica um % sobre o preço atual de todos os imóveis de um estágio (Na planta / Em obras / Pronto novo / Revenda) de uma vez. O cálculo sempre usa o preço atual como base (não há preço-base fixo), então ajustes manuais feitos antes nunca são "perdidos" — o próximo reajuste percentual parte do que estiver salvo no momento.
+
+### localStorage (ainda usado como cache local/sessão)
+- Chave: `pf_perfil_cliente` — perfil JSON do cliente atual (sessão do navegador)
 - Chave: `pf_perfil_etapa` — 'anamnese' ou 'completo'
-- Chave: `pf_empreendimentos_v1` — banco de imóveis de Paulo
-- **Importante:** localStorage é local ao navegador. Paulo deve sempre usar o mesmo navegador e computador para o Motor e o banco de empreendimentos.
+- Chave: `pf_empreendimentos_v1` — cópia local do catálogo (sincronizada com Supabase)
+- **Isso já não é mais uma limitação crítica:** com o Supabase, Paulo pode abrir o Motor, o Banco de Empreendimentos e o Painel de Preços em qualquer navegador/dispositivo — os dados vêm da nuvem. O localStorage permanece só como cache de carregamento rápido.
 
 ---
 
@@ -193,6 +251,10 @@ para atualizar após mudança na imagem ou nas meta tags.
 - ✓ Texto de abertura da Anamnese reformulado (tom consultivo)
 - ✓ Meta tags Open Graph — prévia elegante ao compartilhar links
 - ✓ Aviso de copyright no rodapé (© 2025 Paulo França)
+- ✓ Banco de dados online (Supabase) — perfis de clientes e catálogo de imóveis persistidos na nuvem, acessíveis de qualquer navegador/dispositivo
+- ✓ Motor busca automaticamente clientes recebidos ("Clientes Online") e catálogo de imóveis direto da nuvem
+- ✓ Banco de Empreendimentos sincroniza automaticamente com a nuvem a cada cadastro/edição/exclusão (+ botão "Sincronizar" para migração inicial)
+- ✓ Painel de Preços (precos.html) — atualização manual de preço por imóvel + reajuste percentual em massa por estágio, acessível do celular
 
 ---
 
@@ -202,15 +264,18 @@ para atualizar após mudança na imagem ou nas meta tags.
 - **Filtros excludentes no Motor** — critérios que eliminam imóveis antes da comparação (faixa de valor, bairros excluídos, finalidade, financiamento). Configuráveis por Paulo — ele define quais são inegociáveis.
 
 ### Prioridade média
-- **Banco de Clientes** — histórico de perfis com busca por nome, reabertura no Motor sem precisar importar JSON
+- **Banco de Clientes (tela dedicada)** — PENDENTE, levantado em Junho/2026: hoje o Motor já lista os clientes recebidos via nuvem na seção "Clientes Online", mas de forma simples (sem busca/filtro/histórico organizado). Construir uma tela própria, no estilo do Banco de Empreendimentos, com busca por nome, data de resposta e reabertura direta no Motor. Não é urgente — é melhoria de conforto, mais relevante quando o volume de clientes crescer. Lembrar de perguntar a Paulo se já é hora de priorizar isso.
 - **Template de e-mail do Pesos** — configurar template_pesos_v1 no EmailJS para envio funcionar
 - **Verificar logo residual** — checar se a imagem "Paulo França" ainda aparece em algum ponto específico identificado pelo usuário (pendente de revisão, não alterar sem confirmação)
+- **Campo "unidades disponíveis"** — discutido em Junho/2026 junto com o Painel de Preços, mas adiado por Paulo. Adicionar quando ele pedir, seguindo o mesmo padrão do campo de preço (manual + sincronizado com Supabase).
 
 ### Prioridade baixa / futuro
 - **Renomear repositório** — de `paulofranca` para `curadoria-imobiliaria` (tentativa anterior não foi salva — lembrar de clicar no botão "Renomeação", não só editar o campo)
 - **Domínio próprio** — paulofranca.com.br apontando para o GitHub Pages
-- **Banco de dados online** — Supabase ou Firebase para persistir perfis de clientes entre dispositivos, eliminando dependência do localStorage
 - **Proteção legal formal** — considerar consulta a advogado especializado em propriedade intelectual para registro de software (INPI) e/ou marca, caso o uso comercial justifique
+
+### Concluído em Junho/2026 (não repetir)
+- ~~Banco de dados online (Supabase/Firebase)~~ — feito com Supabase. Ver seção "BANCO DE DADOS ONLINE — SUPABASE" acima para detalhes de tabelas, chaves e onde cada arquivo usa.
 
 ---
 
@@ -245,6 +310,7 @@ curadoria-imobiliaria/
 ├── index.html
 ├── motor.html
 ├── empreendimentos.html
+├── precos.html
 ├── og-image.png
 └── CONTEXTO-PROJETO.md
 ```
@@ -260,5 +326,5 @@ e continue de onde paramos sem retrabalho.
 
 ---
 
-*Documento atualizado em: Junho 2026*
+*Documento atualizado em: Junho 2026 (inclui migração para Supabase, Painel de Preços e correção do fluxo Anamnese→Pesos→Motor)*
 *Sistema desenvolvido com Claude (Anthropic)*
