@@ -365,8 +365,8 @@ let dbImoveis = [];      // banco de empreendimentos
 let selecionados = [];   // IDs selecionados para comparar
 
 // ══ INIT ══
-function init() {
-  loadDB();
+async function init() {
+  await loadDB();
   // Tenta carregar perfil do localStorage (veio direto do Mapa de Pesos)
   try {
     const salvo = localStorage.getItem(PERFIL_KEY);
@@ -386,9 +386,21 @@ function init() {
   updateRunBtn();
 }
 
-function loadDB() {
+async function loadDB() {
   try { dbImoveis = JSON.parse(localStorage.getItem(DB_KEY) || '[]'); }
   catch(e) { dbImoveis = []; }
+  try {
+    const resp = await fetch(`${SUPABASE_URL}/rest/v1/empreendimentos?select=dados&order=updated_at.desc`, {
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+    });
+    if (resp.ok) {
+      const rows = await resp.json();
+      if (rows.length) {
+        dbImoveis = rows.map(r => r.dados);
+        localStorage.setItem(DB_KEY, JSON.stringify(dbImoveis));
+      }
+    }
+  } catch (e) { console.warn('Supabase indisponível, usando catálogo local:', e); }
 }
 
 // ══ PERFIL ══

@@ -246,6 +246,10 @@ select.filter-input{cursor:pointer;}
   </div>
   <div class="header-right">
     <span class="header-count">Total: <strong id="totalCount">0</strong></span>
+    <button class="btn-action ghost" onclick="sincronizarTudoParaNuvem()" title="Enviar todos os empreendimentos cadastrados para a nuvem (Supabase)">
+      <svg class="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/></svg>
+      Sincronizar
+    </button>
     <button class="btn-action ghost" onclick="openImportExport()" title="Importar / Exportar dados">
       <svg class="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
       Exportar
@@ -258,6 +262,7 @@ select.filter-input{cursor:pointer;}
 </header>
 
 <!-- TABS -->
+
 <nav class="tabs-bar">
   <button class="tab-btn active" onclick="switchTab('dashboard')">Dashboard</button>
   <button class="tab-btn" onclick="switchTab('lista')">Lista de Imóveis</button>
@@ -699,14 +704,72 @@ let editingId = null;
 let sortCol = 'criadoEm';
 let sortDir = -1;
 
+// ══ SUPABASE — banco online de empreendimentos ══
+const SUPABASE_URL = 'https://akvnoguimatxfbagbdgo.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_GMEmxNosMWyUzNUa8yJUyQ_zz02wkBj';
+
+async function carregarDoSupabase() {
+  try {
+    const resp = await fetch(`${SUPABASE_URL}/rest/v1/empreendimentos?select=dados&order=updated_at.desc`, {
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+    });
+    if (!resp.ok) throw new Error('Falha na consulta');
+    const rows = await resp.json();
+    if (rows.length) {
+      db = rows.map(r => r.dados);
+      persistLocal();
+      return true;
+    }
+    return false;
+  } catch (e) {
+    console.warn('Supabase indisponível, usando cópia local:', e);
+    return false;
+  }
+}
+
+async function salvarItemNoSupabase(item) {
+  try {
+    await fetch(`${SUPABASE_URL}/rest/v1/empreendimentos?on_conflict=id`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Prefer': 'resolution=merge-duplicates,return=minimal'
+      },
+      body: JSON.stringify({
+        id: item.id, nome: item.nome, estagio: item.estagio, valor: item.valor,
+        updated_at: new Date().toISOString(), dados: item
+      })
+    });
+  } catch (e) { console.warn('Supabase não disponível (salvo só localmente):', e); }
+}
+
+async function excluirItemNoSupabase(id) {
+  try {
+    await fetch(`${SUPABASE_URL}/rest/v1/empreendimentos?id=eq.${encodeURIComponent(id)}`, {
+      method: 'DELETE',
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+    });
+  } catch (e) { console.warn('Supabase não disponível (excluído só localmente):', e); }
+}
+
+async function sincronizarTudoParaNuvem() {
+  if (!db.length) { showToast('Nenhum empreendimento cadastrado para sincronizar.', 'error'); return; }
+  showToast('Sincronizando ' + db.length + ' empreendimento(s) com a nuvem...', '');
+  for (const item of db) { await salvarItemNoSupabase(item); }
+  showToast('Sincronização concluída!', 'success');
+}
+
 // ══ LOAD ══
 function loadDB() {
   try { db = JSON.parse(localStorage.getItem(DB_KEY) || '[]'); }
   catch(e) { db = []; }
 }
+function persistLocal() { localStorage.setItem(DB_KEY, JSON.stringify(db)); }
 
 // ══ INIT ══
-function init() {
+async function init() {
   loadDB();
   buildCheckGroup('check-diferenciais', DIFERENCIAIS, 'dif_', 'cnt-dif');
   buildCheckGroup('check-faixas',       FAIXAS,       'fx_');
@@ -715,6 +778,8 @@ function init() {
   buildCheckGroup('check-horizonte',    HORIZONTES,   'hor_');
   buildScoreGrid();
   renderAll();
+  const veioDaNuvem = await carregarDoSupabase();
+  if (veioDaNuvem) renderAll();
 }
 
 function buildCheckGroup(containerId, items, prefix, counterId) {
@@ -911,6 +976,7 @@ function saveEmpreendimento() {
     db.unshift(item);
   }
   persist();
+  salvarItemNoSupabase(item);
   closeForm();
   renderAll();
   showToast(editingId ? 'Empreendimento atualizado com sucesso.' : 'Empreendimento cadastrado com sucesso!', 'success');
@@ -1170,6 +1236,7 @@ function confirmDelete() {
 }
 function closeConfirm() { document.getElementById('confirm-overlay').classList.remove('open'); }
 function doDelete() {
+  excluirItemNoSupabase(currentId);
   db = db.filter(x=>x.id!==currentId);
   persist(); renderAll();
   closeConfirm(); closeModalBtn();
