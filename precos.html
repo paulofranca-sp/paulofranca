@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Painel de Preços — Paulo França</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700&family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --teal:#0891B2;--teal-dark:#0E7490;--teal-light:#E0F7FA;
+  --gold:#C4933F;--gold-light:#FEF3C7;
+  --dark:#0C1B2E;--text:#1E293B;--text-mid:#475569;--text-soft:#94A3B8;
+  --bg:#F8FAFC;--white:#FFFFFF;--border:#E2E8F0;--border-mid:#CBD5E1;
+  --green:#16A34A;--green-light:#DCFCE7;--red:#DC2626;--red-light:#FEE2E2;
+  --radius:12px;--radius-sm:8px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:60px;}
+.header{background:var(--dark);padding:16px 20px;position:sticky;top:0;z-index:50;}
+.header-logo{font-family:'Playfair Display',serif;font-size:18px;color:white;font-weight:700;}
+.header-sub{font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold);margin-top:2px;}
+.wrap{max-width:640px;margin:0 auto;padding:16px;}
+.section-title{font-size:13px;font-weight:700;color:var(--text-mid);text-transform:uppercase;letter-spacing:0.05em;margin:20px 0 10px;}
+.card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:10px;}
+.card-row{display:flex;align-items:center;gap:10px;}
+.card-info{flex:1;min-width:0;}
+.card-nome{font-weight:500;font-size:14.5px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.card-meta{font-size:12px;color:var(--text-soft);margin-top:2px;}
+.price-input-wrap{display:flex;align-items:center;background:var(--bg);border:1px solid var(--border-mid);border-radius:var(--radius-sm);padding:0 10px;width:148px;flex-shrink:0;}
+.price-input-wrap span{font-size:13px;color:var(--text-soft);}
+.price-input-wrap input{border:none;background:transparent;font-size:15px;font-weight:500;color:var(--text);padding:9px 4px;width:100%;outline:none;font-family:'DM Sans',sans-serif;}
+.save-status{font-size:11px;margin-top:6px;height:14px;}
+.save-status.ok{color:var(--green);}
+.save-status.pending{color:var(--text-soft);}
+.reajuste-box{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:16px;}
+.reajuste-row{display:flex;align-items:center;gap:10px;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);}
+.reajuste-row:last-child{border-bottom:none;}
+.reajuste-label{font-size:14px;color:var(--text);}
+.pct-input-wrap{display:flex;align-items:center;background:var(--bg);border:1px solid var(--border-mid);border-radius:var(--radius-sm);padding:0 4px 0 10px;width:90px;}
+.pct-input-wrap input{border:none;background:transparent;font-size:15px;font-weight:500;color:var(--text);padding:8px 2px;width:100%;outline:none;text-align:right;font-family:'DM Sans',sans-serif;}
+.pct-input-wrap span{font-size:13px;color:var(--text-soft);}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;background:var(--teal);color:white;border:none;border-radius:var(--radius-sm);padding:11px 16px;font-size:13.5px;font-weight:500;cursor:pointer;width:100%;margin-top:14px;font-family:'DM Sans',sans-serif;}
+.btn:active{background:var(--teal-dark);}
+.btn:disabled{opacity:0.5;}
+.btn-secondary{background:transparent;color:var(--teal-dark);border:1px solid var(--teal);margin-top:8px;}
+.empty{text-align:center;padding:40px 20px;color:var(--text-soft);font-size:13.5px;}
+.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--dark);color:white;padding:11px 20px;border-radius:30px;font-size:13px;opacity:0;transition:all .25s;pointer-events:none;z-index:999;white-space:nowrap;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.toast.error{background:var(--red);}
+.search-input{width:100%;padding:11px 14px;border:1px solid var(--border-mid);border-radius:var(--radius-sm);font-size:14px;font-family:'DM Sans',sans-serif;margin-bottom:14px;outline:none;}
+.loading{text-align:center;padding:30px;color:var(--text-soft);font-size:13px;}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-logo">PAULO FRANÇA</div>
+  <div class="header-sub">Painel de Preços</div>
+</div>
+
+<div class="wrap">
+
+  <div class="section-title">Reajuste por Estágio</div>
+  <div class="reajuste-box">
+    <div id="reajuste-rows"></div>
+    <button class="btn" onclick="aplicarReajustes()">Aplicar reajuste aos estágios marcados</button>
+  </div>
+
+  <div class="section-title">Atualizar Preço Individual</div>
+  <input class="search-input" id="busca" placeholder="Buscar empreendimento..." oninput="renderLista()">
+  <div id="lista">
+    <div class="loading">Carregando empreendimentos...</div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SUPABASE_URL = 'https://akvnoguimatxfbagbdgo.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_GMEmxNosMWyUzNUa8yJUyQ_zz02wkBj';
+const ESTAGIOS = ['Na planta','Em obras','Pronto novo','Revenda'];
+
+let itens = [];
+
+function parseMoneyStr(str) {
+  if (!str) return 0;
+  return parseInt((str+'').replace(/\./g,'').replace(/,/g,''), 10) || 0;
+}
+function formatNum(n) { return Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.'); }
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function showToast(msg, type) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast show' + (type ? ' '+type : '');
+  setTimeout(() => el.classList.remove('show'), 2600);
+}
+
+async function init() {
+  renderReajusteRows();
+  await carregarItens();
+}
+
+async function carregarItens() {
+  try {
+    const resp = await fetch(`${SUPABASE_URL}/rest/v1/empreendimentos?select=id,nome,estagio,valor,dados&order=nome.asc`, {
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+    });
+    if (!resp.ok) throw new Error('Falha na consulta');
+    itens = await resp.json();
+    renderLista();
+  } catch (e) {
+    document.getElementById('lista').innerHTML = '<div class="empty">Não foi possível carregar os empreendimentos agora.<br>Verifique a conexão e recarregue a página.</div>';
+  }
+}
+
+function renderReajusteRows() {
+  document.getElementById('reajuste-rows').innerHTML = ESTAGIOS.map((estagio, i) => `
+    <div class="reajuste-row">
+      <label class="reajuste-label" style="display:flex;align-items:center;gap:8px;">
+        <input type="checkbox" id="chk_${i}">
+        ${esc(estagio)}
+      </label>
+      <div class="pct-input-wrap">
+        <input type="number" id="pct_${i}" placeholder="0" step="0.1">
+        <span>%</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderLista() {
+  const filtro = (document.getElementById('busca').value || '').toLowerCase();
+  const filtrados = itens.filter(it => (it.nome||'').toLowerCase().includes(filtro));
+  const cont = document.getElementById('lista');
+  if (!filtrados.length) {
+    cont.innerHTML = '<div class="empty">Nenhum empreendimento encontrado.</div>';
+    return;
+  }
+  cont.innerHTML = filtrados.map(it => `
+    <div class="card">
+      <div class="card-row">
+        <div class="card-info">
+          <div class="card-nome">${esc(it.nome)}</div>
+          <div class="card-meta">${esc(it.estagio||'—')}</div>
+        </div>
+        <div class="price-input-wrap">
+          <span>R$</span>
+          <input type="text" id="val_${it.id}" value="${esc(it.valor||'')}" inputmode="numeric" oninput="maskMoney(this)">
+        </div>
+      </div>
+      <div class="save-status" id="status_${it.id}"></div>
+    </div>
+  `).join('') + `<button class="btn" onclick="salvarTodosPrecos()">Salvar alterações de preço</button>`;
+}
+
+function maskMoney(el) {
+  let v = el.value.replace(/\D/g,'');
+  if (!v) { el.value=''; return; }
+  el.value = parseInt(v,10).toString().replace(/\B(?=(\d{3})+(?!\d))/g,'.');
+  const id = el.id.replace('val_','');
+  const st = document.getElementById('status_'+id);
+  if (st) { st.textContent = 'alterado — não salvo'; st.className='save-status pending'; }
+}
+
+async function atualizarPrecoNoSupabase(id, novoValor) {
+  const item = itens.find(x => x.id === id);
+  if (!item) return;
+  const dados = Object.assign({}, item.dados, { valor: novoValor, atualizadoEm: new Date().toISOString() });
+  await fetch(`${SUPABASE_URL}/rest/v1/empreendimentos?id=eq.${encodeURIComponent(id)}`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      'apikey': SUPABASE_KEY,
+      'Authorization': `Bearer ${SUPABASE_KEY}`,
+      'Prefer': 'return=minimal'
+    },
+    body: JSON.stringify({ valor: novoValor, updated_at: new Date().toISOString(), dados })
+  });
+  item.valor = novoValor;
+  item.dados = dados;
+}
+
+async function salvarTodosPrecos() {
+  const alterados = [];
+  itens.forEach(it => {
+    const input = document.getElementById('val_'+it.id);
+    if (input && input.value !== (it.valor||'')) alterados.push({ id: it.id, valor: input.value });
+  });
+  if (!alterados.length) { showToast('Nenhuma alteração para salvar.'); return; }
+  for (const a of alterados) {
+    await atualizarPrecoNoSupabase(a.id, a.valor);
+    const st = document.getElementById('status_'+a.id);
+    if (st) { st.textContent = 'salvo ✓'; st.className = 'save-status ok'; }
+  }
+  showToast(alterados.length + ' preço(s) atualizado(s) com sucesso!', '');
+}
+
+async function aplicarReajustes() {
+  const ajustes = [];
+  ESTAGIOS.forEach((estagio, i) => {
+    const chk = document.getElementById('chk_'+i);
+    const pct = parseFloat(document.getElementById('pct_'+i).value);
+    if (chk.checked && pct) ajustes.push({ estagio, pct });
+  });
+  if (!ajustes.length) { showToast('Marque ao menos um estágio e informe o percentual.', 'error'); return; }
+
+  const afetados = itens.filter(it => ajustes.some(a => a.estagio === it.estagio));
+  if (!afetados.length) { showToast('Nenhum empreendimento encontrado nesses estágios.', 'error'); return; }
+
+  showToast('Aplicando reajuste a ' + afetados.length + ' empreendimento(s)...');
+  for (const it of afetados) {
+    const ajuste = ajustes.find(a => a.estagio === it.estagio);
+    const valorAtual = parseMoneyStr(it.valor);
+    const novoValor = formatNum(valorAtual * (1 + ajuste.pct/100));
+    await atualizarPrecoNoSupabase(it.id, novoValor);
+  }
+  showToast('Reajuste aplicado a ' + afetados.length + ' empreendimento(s)!');
+  renderLista();
+}
+
+init();
+</script>
+</body>
+</html>
