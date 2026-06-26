@@ -367,21 +367,40 @@ let selecionados = [];   // IDs selecionados para comparar
 // ══ INIT ══
 async function init() {
   await loadDB();
-  // Tenta carregar perfil do localStorage (veio direto do Mapa de Pesos)
+
+  let perfilLocal = null;
   try {
     const salvo = localStorage.getItem(PERFIL_KEY);
-    const etapa = localStorage.getItem('pf_perfil_etapa');
     if (salvo) {
       const p = JSON.parse(salvo);
-      // Só carrega automaticamente se for perfil completo (tem pesos)
-      if (p.pesos && Object.keys(p.pesos).length > 0) {
-        perfil = p;
-        renderClienteCard();
-        showToast('Perfil de ' + (perfil.nome||'cliente') + ' carregado automaticamente.', 'success');
-      }
+      if (p.pesos && Object.keys(p.pesos).length > 0) perfilLocal = p;
     }
   } catch(e) {}
-  buscarClientesOnline(true);
+
+  await buscarClientesOnline(true);
+
+  const maisRecenteOnline = clientesOnline[0] || null; // já vem ordenado por updated_at desc
+
+  // Decide qual perfil carregar automaticamente: o mais recente entre local e nuvem
+  if (maisRecenteOnline && maisRecenteOnline.dados) {
+    const dataOnline = maisRecenteOnline.updated_at ? new Date(maisRecenteOnline.updated_at).getTime() : 0;
+    const dataLocal = perfilLocal && perfilLocal._exportadoEm ? new Date(perfilLocal._exportadoEm).getTime() : 0;
+    if (dataOnline >= dataLocal) {
+      perfil = maisRecenteOnline.dados;
+      localStorage.setItem(PERFIL_KEY, JSON.stringify(perfil));
+      renderClienteCard();
+      showToast('Perfil mais recente carregado: ' + (perfil.nome||'cliente') + ' (recebido pela nuvem).', 'success');
+    } else if (perfilLocal) {
+      perfil = perfilLocal;
+      renderClienteCard();
+      showToast('Perfil de ' + (perfil.nome||'cliente') + ' carregado automaticamente.', 'success');
+    }
+  } else if (perfilLocal) {
+    perfil = perfilLocal;
+    renderClienteCard();
+    showToast('Perfil de ' + (perfil.nome||'cliente') + ' carregado automaticamente.', 'success');
+  }
+
   renderImoveisList();
   updateRunBtn();
 }
