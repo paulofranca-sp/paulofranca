@@ -912,22 +912,23 @@ async function submitForm() {
   window.scrollTo(0, 0);
 
   // ── PASSO 3: tenta enviar e-mail em background (silencioso se falhar) ──
+  // Reaproveita os 2 templates já existentes do EmailJS (plano gratuito permite só 2 templates)
   const body = buildEmailBody();
   try {
-    await emailjs.send('service_alesa01', 'template_pesos_v1', {
+    await emailjs.send('service_alesa01', 'template_nro7ud3', {
       to_email: 'paulofranca.spimoveis@gmail.com', to_name: 'Paulo França',
       from_name: name, client_email: email,
       subject: 'Mapa de Preferências — ' + name,
       message: body
     });
-    await emailjs.send('service_alesa01', 'template_pesos_v1', {
+    await emailjs.send('service_alesa01', 'template_p504cqh', {
       to_email: email, to_name: name, from_name: 'Paulo França',
       subject: 'Seu Mapa de Preferências foi recebido',
       message: 'Olá, ' + name + '!\n\nSeu Mapa de Preferências foi concluído com sucesso.\n\nPaulo analisará suas preferências e entrará em contato para apresentar uma seleção de imóveis alinhados ao seu perfil.\n\nAtenciosamente,\nPaulo França'
     });
   } catch(e) {
     // E-mail falhou mas perfil já foi salvo e baixado — não bloqueia o cliente
-    console.warn('E-mail não enviado (template não configurado):', e);
+    console.warn('E-mail não enviado:', e);
   }
 }
 // ══ EXPORTAR PESOS (JSON) ══
