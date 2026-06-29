@@ -14,9 +14,9 @@ https://github.com/paulofranca-sp/paulofranca
 **E-mail do sistema (EmailJS):**
 paulofranca.spimoveis@gmail.com
 Service ID: service_alesa01
-Template Anamnese → Paulo: template_nro7ud3
-Template Anamnese → Cliente: template_p504cqh
-Template Pesos: template_pesos_v1 (a configurar no EmailJS)
+Template → Paulo (uso geral, Anamnese e Pesos): template_nro7ud3 ("Para enviar por e-mail" fixo = paulofranca.spimoveis@gmail.com)
+Template → Cliente (uso geral, Anamnese e Pesos): template_p504cqh ("Para enviar por e-mail" = {{to_email}}, dinâmico)
+Plano gratuito do EmailJS permite só 2 templates — por isso pesos.html reaproveita os mesmos 2 templates da Anamnese, em vez de ter um template_pesos_v1 próprio (essa ideia foi abandonada).
 
 **Link de agendamento:**
 https://calendar.app.google/dffTZGue9T52RuEe9
@@ -55,12 +55,20 @@ Cliente preenche pesos.html
 
 Paulo abre motor.html (em QUALQUER navegador/computador, não precisa mais ser o mesmo do teste)
     → busca automaticamente na nuvem (Supabase) a lista de perfis com etapa='completo'
-    → mostra em "Clientes Online" — Paulo clica no nome do cliente desejado
-    → (ainda existe, como alternativa: detecção automática via localStorage se for mesmo navegador, e importação manual de JSON)
+    → compara o mais recente da nuvem com o perfil salvo localmente (se houver) e carrega
+      automaticamente no card principal o que for MAIS RECENTE dos dois (corrigido em Junho/2026 —
+      antes, o Motor sempre priorizava o localStorage, que podia estar desatualizado)
+    → mostra também a lista completa em "Clientes Online" para trocar de cliente quando quiser
+      (sem limite de quantidade — mostra todos os perfis completos já recebidos)
     → busca também na nuvem o catálogo de empreendimentos (tabela empreendimentos)
     → seleciona imóveis do banco
     → gera relatório de compatibilidade
 ```
+
+**Observação importante sobre a tabela `perfis_clientes`:** o `email` é a chave única.
+Se um cliente (ou um teste) reaproveitar o mesmo e-mail mais de uma vez, o registro é
+**atualizado** (upsert), não duplicado — por isso, ao testar, use e-mails diferentes
+para cada simulação de cliente se quiser ver várias entradas distintas na lista.
 
 ### BANCO DE DADOS ONLINE — SUPABASE (implementado Junho 2026)
 
@@ -255,6 +263,8 @@ para atualizar após mudança na imagem ou nas meta tags.
 - ✓ Motor busca automaticamente clientes recebidos ("Clientes Online") e catálogo de imóveis direto da nuvem
 - ✓ Banco de Empreendimentos sincroniza automaticamente com a nuvem a cada cadastro/edição/exclusão (+ botão "Sincronizar" para migração inicial)
 - ✓ Painel de Preços (precos.html) — atualização manual de preço por imóvel + reajuste percentual em massa por estágio, acessível do celular
+- ✓ Motor carrega automaticamente o perfil mais recente entre nuvem e local (corrigido — antes priorizava local desatualizado)
+- ✓ E-mail do Mapa de Preferências chegando corretamente (Paulo + cliente), reaproveitando templates existentes
 
 ---
 
@@ -264,8 +274,7 @@ para atualizar após mudança na imagem ou nas meta tags.
 - **Filtros excludentes no Motor** — critérios que eliminam imóveis antes da comparação (faixa de valor, bairros excluídos, finalidade, financiamento). Configuráveis por Paulo — ele define quais são inegociáveis.
 
 ### Prioridade média
-- **Banco de Clientes (tela dedicada)** — PENDENTE, levantado em Junho/2026: hoje o Motor já lista os clientes recebidos via nuvem na seção "Clientes Online", mas de forma simples (sem busca/filtro/histórico organizado). Construir uma tela própria, no estilo do Banco de Empreendimentos, com busca por nome, data de resposta e reabertura direta no Motor. Não é urgente — é melhoria de conforto, mais relevante quando o volume de clientes crescer. Lembrar de perguntar a Paulo se já é hora de priorizar isso.
-- **Template de e-mail do Pesos** — configurar template_pesos_v1 no EmailJS para envio funcionar
+- **Banco de Clientes (tela dedicada)** — PENDENTE, levantado em Junho/2026: hoje o Motor já lista os clientes recebidos via nuvem na seção "Clientes Online" (sem limite, mostra todos), mas de forma simples (sem busca/filtro/organização visual). Construir uma tela própria, no estilo do Banco de Empreendimentos, com busca por nome, data de resposta e reabertura direta no Motor. Não é urgente — é melhoria de conforto, mais relevante quando o volume de clientes crescer. Lembrar de perguntar a Paulo se já é hora de priorizar isso.
 - **Verificar logo residual** — checar se a imagem "Paulo França" ainda aparece em algum ponto específico identificado pelo usuário (pendente de revisão, não alterar sem confirmação)
 - **Campo "unidades disponíveis"** — discutido em Junho/2026 junto com o Painel de Preços, mas adiado por Paulo. Adicionar quando ele pedir, seguindo o mesmo padrão do campo de preço (manual + sincronizado com Supabase).
 
@@ -276,6 +285,8 @@ para atualizar após mudança na imagem ou nas meta tags.
 
 ### Concluído em Junho/2026 (não repetir)
 - ~~Banco de dados online (Supabase/Firebase)~~ — feito com Supabase. Ver seção "BANCO DE DADOS ONLINE — SUPABASE" acima para detalhes de tabelas, chaves e onde cada arquivo usa.
+- ~~Motor sempre mostrava perfil desatualizado do localStorage~~ — corrigido: agora compara nuvem vs. local e carrega automaticamente o mais recente dos dois.
+- ~~E-mail do Mapa de Preferências não chegava (faltava template_pesos_v1)~~ — corrigido sem precisar criar template novo: `pesos.html` passou a reaproveitar os mesmos 2 templates já existentes da Anamnese (`template_nro7ud3` e `template_p504cqh`), pois o plano gratuito do EmailJS só permite 2 templates. Não criar um terceiro template — não há plano para isso.
 
 ---
 
@@ -326,5 +337,5 @@ e continue de onde paramos sem retrabalho.
 
 ---
 
-*Documento atualizado em: Junho 2026 (inclui migração para Supabase, Painel de Preços e correção do fluxo Anamnese→Pesos→Motor)*
+*Documento atualizado em: Junho 2026 (inclui migração para Supabase, Painel de Preços, correção do carregamento automático do Motor e correção do e-mail do Mapa de Preferências)*
 *Sistema desenvolvido com Claude (Anthropic)*
